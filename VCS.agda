@@ -33,6 +33,21 @@ module TreeLikePatch (a : Set) where
       
   data Compatible : ∀ {pt} → PatchTree pt → PatchTree pt → Set where
     
+module RepositoryFromTree (a : Set) where
+
+  open TreeLikePatch a
+  
+  data Patch : PTree → PTree → Set where
+    Init : ∀ {p} → (PatchTree p) → Patch p p
+    _⋀_ : ∀ {t} → Patch t t → Patch t t → Patch t t
+    _⋁_ : ∀ {t} → Patch t t → Patch t t → Patch t t
+    _⋙_ : ∀ {t} → Patch t t → Patch t t → Patch t t
+
+  data _⟷_ : ∀ {pt₁ pt₂} 
+    → (L : Patch pt₁ pt₂) → (R : Patch pt₁ pt₂) → Set where
+    -- ∨-idp : ∀ {pt₁ pt₂}{P : Patch pt₁ pt₂} → P ⟷ (P ∨ P)
+    
+    
 module VecLikePatch (A : Set) where
 
   open Data-Vec
@@ -92,27 +107,16 @@ module RepositoryFromVec (A : Set) where
       → (f₁ ≫ f₂) ⟹ (t₁ ≫ t₂)
       
   patch : ∀ {n}{f t : Req n} → (f ⟹ t) → Data n → Data n
-  patch (Init [] []) [] = []
-  patch (Init (_ ∷ f) (ø ∷ t)) (d ∷ dx) 
-    = d ∷ patch (Init f t) dx
-  patch (Init (_ ∷ f) (⊙ a ∷ t)) (d ∷ dx) 
-    = a ∷ patch (Init f t) dx
-  patch ((f₁ ⋀ f₂) cf ct) x = (patch f₁ ∘ patch f₂) x -- чтоб по-другому!
+  patch (Init f t) [] = []
+  patch (Init (f ∷ xf) (ø ∷ xt)) (x ∷ xs) = x ∷ patch (Init xf xt) xs
+  patch (Init (f ∷ xf) (⊙ a ∷ xt)) (x ∷ xs) = a ∷ patch (Init xf xt) xs
+  patch ((f₁ ⋀ f₂) cf ct) x = (patch f₁ ∘ patch f₂) x
   patch (f₁ ⋙ f₂) x = (patch f₂ ∘ patch f₁) x
-
-module Repository (a : Set) where
-
   
-  open TreeLikePatch a
+  _⟷_ : ∀ {n}{f₁ t₁ f₂ t₂ : Req n} → (f₁ ⟹ t₁) → (f₂ ⟹ t₂) → Set
+  _⟷_ {n} p₁ p₂ = ∀ (x : Data n) → patch p₁ x ≡ patch p₂ x
   
-  data Patch : PTree → PTree → Set where
-    Init : ∀ {p} → (PatchTree p) → Patch p p
-    _⋀_ : ∀ {t} → Patch t t → Patch t t → Patch t t
-    _⋁_ : ∀ {t} → Patch t t → Patch t t → Patch t t
-    _⋙_ : ∀ {t} → Patch t t → Patch t t → Patch t t
+  --⋀-is-⋙ : ∀ {n}{p₁ p₂ : Req n} → (c : Compatible p₁ p₂)
+  --  → ((p₁ ⋀ p₂) c) ⟷ (p₁ ⋙ p₂)
+  --⋀-is-⋙\gtr {n}{p₁}{p₂} c = ?
 
-  data _⟷_ : ∀ {pt₁ pt₂} 
-    → (L : Patch pt₁ pt₂) → (R : Patch pt₁ pt₂) → Set where
-    -- ∨-idp : ∀ {pt₁ pt₂}{P : Patch pt₁ pt₂} → P ⟷ (P ∨ P)
-    
-    
