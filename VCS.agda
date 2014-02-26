@@ -193,11 +193,6 @@ module VecLikePatch2 (A : Set) where
       
   {- тут я в очередной раз запутался -}
 
-{- тут я решил попробовать сделать ядро VCS без доказательств,
-   а доказательства прикрутить потом.
-   Это выглядит разумно с той точки зрения, что, по идее, эта
-   VCS должна в итоге стать программой. А в программе доказательства
-   вырезаются -}
 module VecLikePatch3 (A : Set) where
   open Data-Vec
   open Data-Maybe
@@ -338,14 +333,25 @@ module VecLikePatch4 (A : Set) where
   ⊑-div (⊙-ø {n} {a} {r₁} {r₂} p) (get .(unite r₁ r₂ p) .a d u) = get r₁ a d (⊑-div p u)
   ⊑-div (ø-⊙ {n} {a} {r₁} {r₂} p) (get .(unite r₁ r₂ p) .a d u) = skip r₁ a d (⊑-div p u)
   ⊑-div (ø-ø {n} {r₁} {r₂} p) (skip .(unite r₁ r₂ p) a d u) = skip r₁ a d (⊑-div p u)
+  
+  drop : (n : ℕ)(f t : Req n)
+    → (f' t' : A ⁇) → (f' ∷ f) ⟹ (t' ∷ t) → f ⟹ t
+  drop n f t ø ø p = {!!} -- pattern match on `p` failed ⌢̈
+  drop n f t ø (⊙ a) p = {!!}
+  drop n f t (⊙ a) ø p = {!!}
+  drop n f t (⊙ a) (⊙ a₁) p = {!!}
+
 
   patch : ∀ {n}{f t : Req n} → (f ⟹ t) → (d : Data n) → f ⊑ d → Data n
   patch (Init p) d pp = patchₛ p d pp
-  patch (_⋀_ {f₁ = f₁}{f₂ = f₂} p₁ p₂ cf ct) d pp 
-    with {- unite f₁ f₂ cf -} unite-comm cf | unite-comm cf 
-  ... | i | ppp  = patch p₂ (patch p₁ d (⊑-div cf pp)) {!!}
-  patch (p ⋙ p₁) d pp = patch p₁ (patch p d {!!}) {!!} 
-  
+  patch (_⋀_ p₁ p₂ cf ct) [] pp = []
+  patch {succ n} (_⋀_ {.(succ n)} {ø ∷ f₁} {ø ∷ t₁} {ø ∷ f₂} {ø ∷ t₂} p₁ p₂ (ø-ø cf) (ø-ø ct)) (x₂ ∷ d) (skip .(unite f₁ f₂ cf) .x₂ .d pp) = x₂ ∷ {!!}
+  patch {succ n} (_⋀_ {.(succ n)} {ø ∷ f₁} {ø ∷ t₁} {ø ∷ f₂} {⊙ a ∷ t₂} p₁ p₂ (ø-ø cf) ct) (x₂ ∷ d) pp = {!!}
+  patch {succ n} (_⋀_ {.(succ n)} {ø ∷ f₁} {⊙ a ∷ t₁} {ø ∷ f₂} {x₁ ∷ t₂} p₁ p₂ (ø-ø cf) ct) (x₂ ∷ d) pp = {!!} -- x₂ ∷ patch {n}{f₁}{f₂} {!!} d {!!}
+  patch {succ n} (_⋀_ {.(succ n)} {ø ∷ f₁} {t₁} {⊙ a ∷ f₂} p₁ p₂ cf ct) (x₂ ∷ d) pp = {!!}
+  patch {succ n} (_⋀_ {.(succ n)} {⊙ a ∷ f₁} {t₁} {x₁ ∷ f₂} p₁ p₂ cf ct) (x₂ ∷ d) pp = {!!}
+  patch (p ⋙ p₁) d pp = {!!}
+
     {-
   _⟷_ : ∀ {n}{f₁ t₁ f₂ t₂ : Req n} → (f₁ ⟹ t₁) → (f₂ ⟹ t₂) → Set
   _⟷_ {n} p₁ p₂ = ∀ (x : Data n) → patch p₁ x ≡ patch p₂ x
@@ -354,3 +360,35 @@ module VecLikePatch4 (A : Set) where
   --⋀-is-⋙ : ∀ {n}{p₁ p₂ : Req n} → (c : Compatible p₁ p₂)
   --  → ((p₁ ⋀ p₂) c) ⟷ (p₁ ⋙ p₂)
   --⋀-is-⋙\gtr {n}{p₁}{p₂} c = ?
+
+module VecLikePatchTransposed (A : Set) where
+
+  open ℕ-Op
+  open Data-Vec
+  
+  take : ∀ {A : Set}{m} → (n : ℕ) → Vec A (n + m) → Vec A n
+  take zero v = []
+  take (succ n) (x ∷ v) = x ∷ take n v
+  
+  drop : ∀ {A : Set}{m} → (n : ℕ) → Vec A (n + m) → Vec A m
+  drop zero v = v
+  drop (succ n) (_ ∷ v) = drop n v
+
+  mutual
+    data Patch : (n : ℕ) → Set where
+      I : Patch (succ zero)
+      _⇔_ : A → A → Patch (succ zero)
+      _⊹_ : ∀ {n m} → Patch n → Patch m → Patch (n + m)
+      _⋀_ : ∀ {n} → (p₁ : Patch n) → (p₂ : Patch n) 
+        → (p₁ ∥ p₂) → Patch n
+      _⋙_ : ∀ {n} → (p₁ : Patch n) → (p₂ : Patch n)
+        → Patch n
+    
+    data _∥_ : {n : ℕ} → Patch n → Patch n → Set where
+      I∥⋆ : (a b : A) → I ∥ (a ⇔ b)
+      ⋆∥I : (a b : A) → (a ⇔ b) ∥ I
+      I∥I : I ∥ I
+      _|⊹|_ : ∀ {n m}{pₗ₁ pₗ₂ : Patch n}{pᵣ₁ pᵣ₂ : Patch m} 
+        → pₗ₁ ∥ pₗ₂ → pᵣ₁ ∥ pᵣ₂ → (pₗ₁ ⊹ pᵣ₁) ∥ (pₗ₂ ⊹ pᵣ₂)
+
+  
