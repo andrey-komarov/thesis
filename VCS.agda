@@ -225,3 +225,132 @@ module VecLikePatch3 (A : Set) where
 --    ⋀-ap : ∀ {n}{x : Data n}{p₁ p₂ : Patch n}
 --      → Applyable p₁ n → Applyable p₂ n → 
     
+
+module VecLikePatch4 (A : Set) where
+  open Data-Vec
+  open Data-Maybe
+
+  Data : ℕ → Set
+  Data n = Vec A n  
+    
+  Req : ℕ → Set
+  Req n = Vec (A ⁇) n
+  
+  SimplePatch : ℕ → Set
+  SimplePatch n = Vec ((A × A) ⁇) n
+  
+  data _∥_ : ∀ {n} → Req n → Req n → Set where
+    []∥[] : [] ∥ []
+    ⊙-ø : ∀ {n}{a}{r₁ r₂ : Req n}
+      → r₁ ∥ r₂ → (⊙ a ∷ r₁) ∥ (ø ∷ r₂)
+    ø-⊙ : ∀ {n}{a}{r₁ r₂ : Req n}
+      → r₁ ∥ r₂ → (ø ∷ r₁) ∥ (⊙ a ∷ r₂)
+    ø-ø : ∀ {n}{r₁ r₂ : Req n}
+      → r₁ ∥ r₂ → (ø ∷ r₁) ∥ (ø ∷ r₂)
+      
+  unite : ∀ {n} → (r₁ : Req n) → (r₂ : Req n) → (r₁ ∥ r₂) → Req n
+  unite .[] .[] []∥[] = []
+  unite .(⊙ a ∷ r₁) .(ø ∷ r₂) (⊙-ø {n} {a} {r₁} {r₂} c) 
+    = ⊙ a ∷ unite r₁ r₂ c
+  unite .(ø ∷ r₁) .(⊙ a ∷ r₂) (ø-⊙ {n} {a} {r₁} {r₂} c) 
+    = ⊙ a ∷ unite r₁ r₂ c
+  unite .(ø ∷ r₁) .(ø ∷ r₂) (ø-ø {n} {r₁} {r₂} c) 
+    = ø ∷ unite r₁ r₂ c
+    
+  _≫_ : ∀ {n} → (r₁ : Req n) → (r₂ : Req n) → Req n
+  [] ≫ [] = []
+  (r ∷ r₁) ≫ (ø ∷ r₂) = r ∷ (r₁ ≫ r₂)
+  (_ ∷ r₁) ≫ (r ∷ r₂) = r ∷ (r₁ ≫ r₂)
+  
+  map : ∀ {n}{A B : Set} → (f : A → B) → Vec A n → Vec B n
+  map f [] = []
+  map f (x ∷ v) = f x ∷ map f v
+
+  domₛ : ∀ {n} → SimplePatch n → Req n
+  domₛ = map $ map⁇ projl
+  
+  codomₛ : ∀ {n} → SimplePatch n → Req n
+  codomₛ = map $ map⁇ projr
+
+  data _⟹_ : ∀ {n} → Req n → Req n → Set where
+    Init : ∀ {n} (p : SimplePatch n) → (domₛ p) ⟹ (codomₛ p)
+    _⋀_ : ∀ {n}{f₁ t₁ f₂ t₂ : Req n} 
+      → (p₁ : f₁ ⟹ t₁) → (p₂ : f₂ ⟹ t₂)
+      → (cf : f₁ ∥ f₂) → (ct : t₁ ∥ t₂)
+      → (unite f₁ f₂ cf ⟹ unite t₁ t₂ ct)
+    _⋙_ : ∀ {n}{f₁ t₁ f₂ t₂ : Req n}
+      → (p₁ : f₁ ⟹ t₁) → (p₂ : f₂ ⟹ t₂)
+      → (f₁ ≫ f₂) ⟹ (t₁ ≫ t₂)
+      
+  data _⊑_ : ∀ {n} → Req n → Data n → Set where
+    empty : [] ⊑ []
+    skip : ∀ {n} (r : Req n)(a : A)(d : Data n) 
+      → (r ⊑ d) → (ø ∷ r) ⊑ (a ∷ d)
+    get : ∀ {n} (r : Req n)(a : A)(d : Data n) 
+      → (r ⊑ d) → (⊙ a ∷ r) ⊑ (a ∷ d)
+
+  dom : ∀ {n}{r₁ r₂ : Req n} (p : r₁ ⟹ r₂) → Req n
+  dom (Init p) = domₛ p
+  dom (_⋀_ p p₁ cf ct) = dom p ≫ dom p₁
+  dom (p ⋙ p₁) = dom p ≫ dom p₁
+
+  codom : ∀ {n}{r₁ r₂ : Req n} (p : r₁ ⟹ r₂) → Req n
+  codom (Init p) = codomₛ p
+  codom (_⋀_ p p₁ cf ct) = codom p ≫ codom p₁
+  codom (p ⋙ p₁) = codom p ≫ codom p₁
+
+  unite-is-≫ : ∀ {n}{r₁ r₂ : Req n} → (p : r₁ ∥ r₂)
+    → unite r₁ r₂ p ≡ r₁ ≫ r₂
+  unite-is-≫ []∥[] = refl
+  unite-is-≫ (⊙-ø p) rewrite unite-is-≫ p = refl
+  unite-is-≫ (ø-⊙ p) rewrite unite-is-≫ p = refl
+  unite-is-≫ (ø-ø p) rewrite unite-is-≫ p = refl
+
+  lemma-1 : ∀ {n}{r₁ r₂ : Req n} (p : r₁ ⟹ r₂) → r₁ ≡ dom p
+  lemma-1 (Init p) = refl
+  lemma-1 (_⋀_ p p₁ cf ct) with dom p | lemma-1 p | dom p₁ | lemma-1 p₁ 
+  lemma-1 (_⋀_ p p₁ cf ct) | _ | refl | _ | refl = unite-is-≫ cf
+  lemma-1 (p ⋙ p₁) with dom p | lemma-1 p | dom p₁ | lemma-1 p₁
+  lemma-1 (p ⋙ p₁) | w | refl | w₁ | refl = refl
+  
+  patchₛ : ∀ {n} (p : SimplePatch n) → (d : Data n) → (domₛ p ⊑ d) → Data n
+  patchₛ [] [] empty = []
+  patchₛ (ø ∷ p) (x₁ ∷ d) (skip .(map (map⁇ projl) p) .x₁ .d pp) = x₁ ∷ patchₛ p d pp
+  patchₛ (⊙ (f , t) ∷ p) (.f ∷ d)  (get .(map (map⁇ projl) p) .f .d pp) 
+    = t ∷ patchₛ p d pp
+    
+  ∥-comm : ∀ {n}{r₁ r₂ : Req n} → r₁ ∥ r₂ → r₂ ∥ r₁
+  ∥-comm []∥[] = []∥[]
+  ∥-comm (⊙-ø p) = ø-⊙ (∥-comm p)
+  ∥-comm (ø-⊙ p) = ⊙-ø (∥-comm p)
+  ∥-comm (ø-ø p) = ø-ø (∥-comm p)
+
+  unite-comm : ∀ {n}{r₁ r₂ : Req n}(p : r₁ ∥ r₂)
+    → unite r₁ r₂ p ≡ unite r₂ r₁ (∥-comm p)
+  unite-comm []∥[] = refl
+  unite-comm (⊙-ø p) rewrite unite-comm p = refl
+  unite-comm (ø-⊙ p) rewrite unite-comm p = refl
+  unite-comm (ø-ø p) rewrite unite-comm p = refl
+
+  ⊑-div : ∀ {n}{f₁ f₂ : Req n}{d : Data n}
+    (p : f₁ ∥ f₂) → (unite f₁ f₂ p) ⊑ d → f₁ ⊑ d
+  ⊑-div []∥[] empty = empty
+  ⊑-div (⊙-ø {n} {a} {r₁} {r₂} p) (get .(unite r₁ r₂ p) .a d u) = get r₁ a d (⊑-div p u)
+  ⊑-div (ø-⊙ {n} {a} {r₁} {r₂} p) (get .(unite r₁ r₂ p) .a d u) = skip r₁ a d (⊑-div p u)
+  ⊑-div (ø-ø {n} {r₁} {r₂} p) (skip .(unite r₁ r₂ p) a d u) = skip r₁ a d (⊑-div p u)
+
+  patch : ∀ {n}{f t : Req n} → (f ⟹ t) → (d : Data n) → f ⊑ d → Data n
+  patch (Init p) d pp = patchₛ p d pp
+  patch (_⋀_ {f₁ = f₁}{f₂ = f₂} p₁ p₂ cf ct) d pp 
+    with {- unite f₁ f₂ cf -} unite-comm cf | unite-comm cf 
+  ... | i | ppp  = patch p₂ (patch p₁ d (⊑-div cf pp)) {!!}
+  patch (p ⋙ p₁) d pp = patch p₁ (patch p d {!!}) {!!} 
+  
+    {-
+  _⟷_ : ∀ {n}{f₁ t₁ f₂ t₂ : Req n} → (f₁ ⟹ t₁) → (f₂ ⟹ t₂) → Set
+  _⟷_ {n} p₁ p₂ = ∀ (x : Data n) → patch p₁ x ≡ patch p₂ x
+    -}
+  
+  --⋀-is-⋙ : ∀ {n}{p₁ p₂ : Req n} → (c : Compatible p₁ p₂)
+  --  → ((p₁ ⋀ p₂) c) ⟷ (p₁ ⋙ p₂)
+  --⋀-is-⋙\gtr {n}{p₁}{p₂} c = ?
