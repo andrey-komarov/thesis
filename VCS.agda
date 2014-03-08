@@ -373,7 +373,7 @@ module VecLikePatchTransposed (A : Set) where
   drop : ∀ {A : Set}{m} → (n : ℕ) → Vec A (n + m) → Vec A m
   drop zero v = v
   drop (succ n) (_ ∷ v) = drop n v
-
+  
   mutual
     data Patch : (n : ℕ) → Set where
       I : Patch (succ zero)
@@ -391,4 +391,263 @@ module VecLikePatchTransposed (A : Set) where
       _|⊹|_ : ∀ {n m}{pₗ₁ pₗ₂ : Patch n}{pᵣ₁ pᵣ₂ : Patch m} 
         → pₗ₁ ∥ pₗ₂ → pᵣ₁ ∥ pᵣ₂ → (pₗ₁ ⊹ pᵣ₁) ∥ (pₗ₂ ⊹ pᵣ₂)
 
+module VecLikePatchTransposedIndexed (A : Set) where
+
+  open ℕ-Op
+  open Data-Vec
+  open Data-Maybe
   
+  take : ∀ {A : Set}{m} → (n : ℕ) → Vec A (n + m) → Vec A n
+  take zero v = []
+  take (succ n) (x ∷ v) = x ∷ take n v
+  
+  drop : ∀ {A : Set}{m} → (n : ℕ) → Vec A (n + m) → Vec A m
+  drop zero v = v
+  drop (succ n) (_ ∷ v) = drop n v
+  
+  _++_ : ∀ {A : Set}{n m : ℕ} → Vec A n → Vec A m → Vec A (n + m)
+  [] ++ v = v
+  (x ∷ v₁) ++ v₂ = x ∷ v₁ ++ v₂
+
+  [_] : ∀ {A : Set} → A → Vec A (succ zero)
+  [ x ] = x ∷ []
+
+  data _≫_≡_ {A : Set} : ∀ {n : ℕ} 
+    → Vec (A ⁇) n → Vec (A ⁇) n → Vec (A ⁇) n → Set where
+    []≫[] : [] ≫ [] ≡ []
+    ø≫ø : ∀ {n}{v₁ v₂ v₃ : Vec (A ⁇) n} 
+      → v₁ ≫ v₂ ≡ v₃ → (ø ∷ v₁) ≫ (ø ∷ v₂) ≡ (ø ∷ v₃)
+    ⊙≫ø : ∀ {n}{v₁ v₂ v₃ : Vec (A ⁇) n}
+      → (a : A) → (v₁ ≫ v₂ ≡ v₃)
+      → (⊙ a ∷ v₁) ≫ (ø ∷ v₂) ≡ (⊙ a ∷ v₃)
+    ✶≫⊙ : ∀ {n}{v₁ v₂ v₃ : Vec (A ⁇) n}
+      → (l : A ⁇) → (r : A) → (v₁ ≫ v₂ ≡ v₃)
+      → (l ∷ v₁) ≫ (⊙ r ∷ v₂) ≡ (⊙ r ∷ v₃)
+      
+  data _≪≫_≡_ {A : Set} : ∀ {n : ℕ}
+    → Vec (A ⁇) n → Vec (A ⁇) n → Vec (A ⁇) n → Set where
+    []≪≫[] : [] ≪≫ [] ≡ []
+    ø≪≫ø : ∀ {n}{v₁ v₂ v₃ : Vec (A ⁇) n}
+      → v₁ ≪≫ v₂ ≡ v₃ → (ø ∷ v₁) ≪≫ (ø ∷ v₂) ≡ (ø ∷ v₃)
+    ⊙≪≫ø : ∀ {n}{v₁ v₂ v₃ : Vec (A ⁇) n}
+      → (a : A) → v₁ ≪≫ v₂ ≡ v₃
+      → (⊙ a ∷ v₁) ≪≫ (ø ∷ v₂) ≡ (⊙ a ∷ v₃)
+    ø≪≫⊙ : ∀ {n}{v₁ v₂ v₃ : Vec (A ⁇) n}
+      → (a : A) → v₁ ≪≫ v₂ ≡ v₃
+      → (ø ∷ v₁) ≪≫ (⊙ a ∷ v₂) ≡ (⊙ a ∷ v₃)
+    ⊙≪≫⊙ : ∀ {n}{v₁ v₂ v₃ : Vec (A ⁇) n}
+      → (a : A) → v₁ ≪≫ v₂ ≡ v₃
+      → (⊙ a ∷ v₁) ≪≫ (⊙ a ∷ v₂) ≡ (⊙ a ∷ v₃)
+
+  data _∥_ {A : Set} : ∀ {n} → Vec (A ⁇) n → Vec (A ⁇) n → Set where
+    []∥[] : [] ∥ []
+    ø∥ø : ∀ {n}{v₁ v₂ : Vec (A ⁇) n} → v₁ ∥ v₂ → (ø ∷ v₁) ∥ (ø ∷ v₂)
+    ⊙∥ø : ∀ {n}{v₁ v₂ : Vec (A ⁇) n} 
+      → v₁ ∥ v₂ → (a : A) → (⊙ a ∷ v₁) ∥ (ø ∷ v₂)
+    ø∥⊙ : ∀ {n}{v₁ v₂ : Vec (A ⁇) n}
+      → v₁ ∥ v₂ → (a : A) → (ø ∷ v₁) ∥ (⊙ a ∷ v₂)
+    ⊙∥⊙ : ∀ {n}{v₁ v₂ : Vec (A ⁇) n}
+      → v₁ ∥ v₂ → (a : A) → (⊙ a ∷ v₁) ∥ (⊙ a ∷ v₂)
+      
+  data _⊏_ {A : Set} : ∀ {n} → Vec (A ⁇) n → Vec A n → Set where
+    []⊏[] : [] ⊏ []
+    ø⊏ : ∀ {n}{v : Vec (A ⁇) n}{x : Vec A n}
+      → v ⊏ x → (a : A) → (ø ∷ v) ⊏ (a ∷ x)
+    ⊙⊏ : ∀ {n}{v : Vec (A ⁇) n}{x : Vec A n}
+      → v ⊏ x → (a : A) → (⊙ a ∷ v) ⊏ (a ∷ x)
+      
+  data _≃_ {A B : Set} : ∀ {n} → Vec (A ⁇) n → Vec (B ⁇) n → Set where
+    []≃[] : [] ≃ []
+    ø≃ø : ∀ {n}{v₁ : Vec (A ⁇) n}{v₂ : Vec (B ⁇) n}
+      → v₁ ≃ v₂ → (ø ∷ v₁) ≃ (ø ∷ v₂)
+    ⊙≃⊙ : ∀ {n}{v₁ : Vec (A ⁇) n}{v₂ : Vec (B ⁇) n}
+      → v₁ ≃ v₂ → (a : A) → (b : B) → (⊙ a ∷ v₁) ≃ (⊙ b ∷ v₂)
+
+  data _is_/_ {A B : Set} : ∀ {n} 
+    → Vec A n → Vec A n → Vec (B ⁇) n → Set where
+    []is[]/[] : [] is [] / []
+    same/ø : ∀ {n}{v₁ v₂ : Vec A n}{v₃ : Vec (B ⁇) n}
+      → v₁ is v₂ / v₃ → (a : A)
+      → (a ∷ v₁) is (a ∷ v₂) / (ø ∷ v₃)
+    diff/⊙ : ∀ {n}{v₁ v₂ : Vec A n}{v₃ : Vec (B ⁇) n}
+      → v₁ is v₂ / v₃ → (a b : A) → (c : B)
+      → (a ∷ v₁) is (b ∷ v₂) / (⊙ c ∷ v₃)
+      
+  -- Patch (what-should-be-before) (what-we-know-after)
+  data Patch1 : A ⁇ → A ⁇ → Set where
+    I : Patch1 ø ø
+    _⇔_ : (from to : A) → Patch1 (⊙ from) (⊙ to)
+
+  data Patch : {n : ℕ} → Vec (A ⁇) n → Vec (A ⁇) n → Set where
+    --I : Patch [ ø ] [ ø ]
+    --_⇔_ : (from to : A) → Patch [ ⊙ from ] [ ⊙ to ]
+    --_∷+_ : ∀ {n}{f₁ t₁ : Vec (A ⁇) (succ zero)}{f₂ t₂ : Vec (A ⁇) n}
+    --  → Patch f₁ t₁ → Patch f₂ t₂ → Patch (f₁ ++ f₂) (t₁ ++ t₂)
+    O : Patch [] []
+    _∷+_ : ∀ {n}{f₁ t₁ : A ⁇}{f₂ t₂ : Vec (A ⁇) n}
+      → (p : Patch1 f₁ t₁) → (px : Patch f₂ t₂) 
+      → Patch (f₁ ∷ f₂) (t₁ ∷ t₂)
+    ⋀ : ∀ {n}{f₁ t₁ f₂ t₂ f₃ t₃ : Vec (A ⁇) n}
+      → (f₁∥f₂ : f₁ ∥ f₂) → (t₁∥t₂ : t₁ ∥ t₂)
+      → (f₃-ok : f₁ ≪≫ f₂ ≡ f₃) → (t₃-ok : t₁ ≪≫ t₂ ≡ t₃)
+      → (p₁ : Patch f₁ t₁) → (p₂ : Patch f₂ t₂) 
+      → Patch f₃ t₃
+    ⋙ : ∀ {n}{f₁ t₁ f₂ t₂ f₃ t₃ : Vec (A ⁇) n} 
+      → (f₃-ok : f₁ ≫ f₂ ≡ f₃) → (t₃-ok : t₁ ≫ t₂ ≡ t₃) → (can : t₁ ∥ f₂)
+      → (p₁ : Patch f₁ t₁) → (p₂ : Patch f₂ t₂)
+      → Patch f₃ t₃
+      
+  lem : ∀ {A : Set} {n : ℕ} {v₁ v₂ v₃ v₄ : Vec (A ⁇) n}
+    → v₁ ≫ v₂ ≡ v₃ 
+    → v₁ ≫ v₂ ≡ v₄ 
+    → v₃ ≡ v₄
+  lem []≫[] []≫[] = refl
+  lem (ø≫ø p₁) (ø≫ø p₂) rewrite lem p₁ p₂ = refl
+  lem (⊙≫ø a p₁) (⊙≫ø .a p₂) rewrite lem p₁ p₂ = refl
+  lem (✶≫⊙ l r p₁) (✶≫⊙ .l .r p₂) rewrite lem p₁ p₂ = refl
+  
+  ∥→≪≫ : ∀ {n}{v₁ v₂ : Vec (A ⁇) n}
+    → v₁ ∥ v₂ → Σ (Vec (A ⁇) n) λ v₃ → v₁ ≪≫ v₂ ≡ v₃
+  ∥→≪≫ []∥[] = [] , []≪≫[]
+  ∥→≪≫ (ø∥ø p) with ∥→≪≫ p
+  ... | v₃ , pp = (ø ∷ v₃) , ø≪≫ø pp
+  ∥→≪≫ (⊙∥ø p a) with ∥→≪≫ p 
+  ... | v₃ , pp = (⊙ a ∷ v₃) , ⊙≪≫ø a pp
+  ∥→≪≫ (ø∥⊙ p a) with ∥→≪≫ p 
+  ... | v₃ , pp = (⊙ a ∷ v₃) , ø≪≫⊙ a pp
+  ∥→≪≫ (⊙∥⊙ p a) with ∥→≪≫ p 
+  ... | v₃ , pp = (⊙ a ∷ v₃) , ⊙≪≫⊙ a pp
+
+  ≃-≪≫-lem : ∀ {n}{v₁₁ v₁₂ v₁₃ v₂₁ v₂₂ v₂₃ : Vec (A ⁇) n}
+    → v₁₁ ≃ v₂₁ → v₁₂ ≃ v₂₂
+    → v₁₁ ≪≫ v₁₂ ≡ v₁₃ → v₂₁ ≪≫ v₂₂ ≡ v₂₃
+    → v₁₃ ≃ v₂₃
+  ≃-≪≫-lem []≃[] []≃[] []≪≫[] []≪≫[] = []≃[]
+  ≃-≪≫-lem (ø≃ø ≃1) (ø≃ø ≃2) (ø≪≫ø ≪≫1) (ø≪≫ø ≪≫2) 
+    = ø≃ø (≃-≪≫-lem ≃1 ≃2 ≪≫1 ≪≫2)
+  ≃-≪≫-lem (ø≃ø ≃1) (⊙≃⊙ ≃2 a b) (ø≪≫⊙ .a ≪≫1) (ø≪≫⊙ .b ≪≫2) 
+    = ⊙≃⊙ (≃-≪≫-lem ≃1 ≃2 ≪≫1 ≪≫2) a b
+  ≃-≪≫-lem (⊙≃⊙ ≃1 a b) (ø≃ø ≃2) (⊙≪≫ø .a ≪≫1) (⊙≪≫ø .b ≪≫2) 
+    = ⊙≃⊙ (≃-≪≫-lem ≃1 ≃2 ≪≫1 ≪≫2) a b
+  ≃-≪≫-lem (⊙≃⊙ ≃1 .a .b) (⊙≃⊙ ≃2 a b) (⊙≪≫⊙ .a ≪≫1) (⊙≪≫⊙ .b ≪≫2) 
+    = ⊙≃⊙ (≃-≪≫-lem ≃1 ≃2 ≪≫1 ≪≫2) a b
+    
+  ≃-≫-lem : ∀ {n}{v₁₁ v₁₂ v₁₃ v₂₁ v₂₂ v₂₃ : Vec (A ⁇) n}
+    → v₁₁ ≃ v₂₁ → v₁₂ ≃ v₂₂
+    → v₁₁ ≫ v₁₂ ≡ v₁₃ → v₂₁ ≫ v₂₂ ≡ v₂₃
+    → v₁₃ ≃ v₂₃
+  ≃-≫-lem []≃[] []≃[] []≫[] []≫[] = []≃[]
+  ≃-≫-lem (ø≃ø ≃1) (ø≃ø ≃2) (ø≫ø ≫1) (ø≫ø ≫2) 
+    = ø≃ø (≃-≫-lem ≃1 ≃2 ≫1 ≫2)
+  ≃-≫-lem (ø≃ø ≃1) (⊙≃⊙ ≃2 a b) (✶≫⊙ .ø .a ≫1) (✶≫⊙ .ø .b ≫2) 
+    = ⊙≃⊙ (≃-≫-lem ≃1 ≃2 ≫1 ≫2) a b
+  ≃-≫-lem (⊙≃⊙ ≃1 a b) (ø≃ø ≃2) (⊙≫ø .a ≫1) (⊙≫ø .b ≫2) 
+    = ⊙≃⊙ (≃-≫-lem ≃1 ≃2 ≫1 ≫2) a b
+  ≃-≫-lem (⊙≃⊙ ≃1 a b) (⊙≃⊙ ≃2 a₁ b₁) (✶≫⊙ .(⊙ a) .a₁ ≫1) (✶≫⊙ .(⊙ b) .b₁ ≫2) 
+    = ⊙≃⊙ (≃-≫-lem ≃1 ≃2 ≫1 ≫2) a₁ b₁
+
+  Patch-lem : ∀ {n}{f t : Vec (A ⁇) n}
+    → (p : Patch f t) → f ≃ t
+  Patch-lem O = []≃[]
+  Patch-lem (I ∷+ p) = ø≃ø (Patch-lem p)
+  Patch-lem ((from ⇔ to) ∷+ p) = ⊙≃⊙ (Patch-lem p) from to
+  Patch-lem (⋀ f₁∥f₂ t₁∥t₂ f₃-ok t₃-ok p p₁) 
+    = ≃-≪≫-lem (Patch-lem p) (Patch-lem p₁) f₃-ok t₃-ok
+  Patch-lem (⋙ f₃-ok t₃-ok can p p₁) 
+    = ≃-≫-lem (Patch-lem p) (Patch-lem p₁) f₃-ok t₃-ok
+
+  patch : ∀ {n} {f t : Vec (A ⁇) n} (x : Vec A n)
+    → f ⊏ x → (p : Patch f t) → Vec A n
+  patch [] []⊏[] O = []
+  patch (x ∷ xs) (ø⊏ pf .x) (I ∷+ px) = x ∷ patch xs pf px
+  patch (x ∷ xs) (⊙⊏ pf .x) ((.x ⇔ to) ∷+ px) = to ∷ patch xs pf px
+  patch x pf (⋀ x₁ x₂ x₃ x₄ p p₁) = {!!}
+  patch x pf (⋙ f₃-ok t₃-ok t₁∥f₂ p₁ p₂) = 
+    patch (patch x {!!} p₁) {!!} p₂
+
+  ∥-lem-1 : ∀ {n}{v₁ v₂ v₃ : Vec (A ⁇) n}{x : Vec A n} 
+    → v₁ ≪≫ v₂ ≡ v₃ → v₃ ⊏ x → v₁ ⊏ x
+  ∥-lem-1 []≪≫[] []⊏[] = []⊏[]
+  ∥-lem-1 (ø≪≫ø p1) (ø⊏ p2 a) = ø⊏ (∥-lem-1 p1 p2) a
+  ∥-lem-1 (⊙≪≫ø a p1) (⊙⊏ p2 .a) = ⊙⊏ (∥-lem-1 p1 p2) a
+  ∥-lem-1 (ø≪≫⊙ a p1) (⊙⊏ p2 .a) = ø⊏ (∥-lem-1 p1 p2) a
+  ∥-lem-1 (⊙≪≫⊙ a p1) (⊙⊏ p2 .a) = ⊙⊏ (∥-lem-1 p1 p2) a
+  
+  ≪≫-sym : ∀ {n}{v₁ v₂ v₃ : Vec (A ⁇) n}
+    → v₁ ≪≫ v₂ ≡ v₃ → v₂ ≪≫ v₁ ≡ v₃
+  ≪≫-sym []≪≫[] = []≪≫[]
+  ≪≫-sym (ø≪≫ø p) = ø≪≫ø (≪≫-sym p)
+  ≪≫-sym (⊙≪≫ø a p) = ø≪≫⊙ a (≪≫-sym p)
+  ≪≫-sym (ø≪≫⊙ a p) = ⊙≪≫ø a (≪≫-sym p)
+  ≪≫-sym (⊙≪≫⊙ a p) = ⊙≪≫⊙ a (≪≫-sym p)
+
+  
+  vpatch-lem-1 : ∀ {n}{x y : Vec A n}{v₁ v₂ v₃ : Vec (A ⁇) n}
+    → v₁ ≪≫ v₂ ≡ v₃ → v₃ ⊏ x
+    → x is y / v₁ → v₂ ⊏ y
+  vpatch-lem-1 []≪≫[] []⊏[] []is[]/[] = []⊏[]
+  vpatch-lem-1 (ø≪≫ø ≪≫) (ø⊏ ⊏1 a) (same/ø is/ .a) 
+    = ø⊏ (vpatch-lem-1 ≪≫ ⊏1 is/) a
+  vpatch-lem-1 (⊙≪≫ø a ≪≫) (⊙⊏ ⊏1 .a) (diff/⊙ is/ .a b .a) 
+    = ø⊏ (vpatch-lem-1 ≪≫ ⊏1 is/) b
+  vpatch-lem-1 (ø≪≫⊙ a ≪≫) (⊙⊏ ⊏1 .a) (same/ø is/ .a) 
+    = ⊙⊏ (vpatch-lem-1 ≪≫ ⊏1 is/) a
+  vpatch-lem-1 (⊙≪≫⊙ a ≪≫) (⊙⊏ ⊏1 .a) (diff/⊙ is/ .a b .a) 
+    = {!!}
+
+  vpatch : ∀ {n} {f t : Vec (A ⁇) n} (x : Vec A n)
+    → f ⊏ x → (p : Patch f t) → Σ (Vec A n) λ y → (t ⊏ y) × (x is y / f)
+  vpatch [] []⊏[] O = [] , []⊏[] , []is[]/[]
+  vpatch (x ∷ xs) (ø⊏ pf .x) (I ∷+ px) with vpatch xs pf px 
+  ... | tail , p1 , p2 = (x ∷ tail) , ø⊏ p1 x , same/ø p2 x
+  vpatch (x ∷ xs) (⊙⊏ pf .x) ((.x ⇔ to) ∷+ px) with vpatch xs pf px
+  ... | tail , p1 , p2 = (to ∷ tail) , ⊙⊏ p1 to , diff/⊙ p2 x to x
+  vpatch x pf (⋀ f₁∥f₂ t₁∥t₂ f₃-ok t₃-ok p₁ p₂) with vpatch x (∥-lem-1 f₃-ok pf) p₁ 
+  ... | s₁ , p1 , p2 with vpatch s₁ {!!} {-(vpatch-lem-1 f₃-ok pf p2)-} p₂
+  ... | s₂ , p3 , p4 = {!!}
+  vpatch x pf (⋙ f₃-ok t₃-ok can p p₁) = {!!}
+
+  {-
+  vpatch : ∀ {n} {f t : Vec (A ⁇) n} (x : Vec A n)
+    → f ⊏ x → (p : Patch f t) → Σ (Vec A n) λ y → t ⊏ y
+  vpatch [] []⊏[] O = [] , []⊏[]
+  vpatch (x ∷ xs) (ø⊏ pf .x) (I ∷+ px) with vpatch xs pf px
+  ... | tail , p = (x ∷ tail) , ø⊏ p x
+  vpatch (x ∷ xs) (⊙⊏ pf .x) ((.x ⇔ to) ∷+ px) with vpatch xs pf px
+  ... | tail , p = (to ∷ tail) , ⊙⊏ p to
+  vpatch x pf (⋀ {f₂ = f₂}f₁∥f₂ t₁∥t₂ f₃-ok t₃-ok p₁ p₂) with vpatch x (∥-lem-1 f₃-ok pf) p₁
+  ... | s₁ , ppp with vpatch s₁ {!!} p₂
+  ... | s₂ , pppp = {!!} 
+  vpatch x pf (⋙ f₃-ok t₃-ok can p₁ p₂) with vpatch x {!!} p₁
+  ... | s₁ , ppp with vpatch s₁ {!!} p₂
+  ... | s₂ , pppp = {!!}
+  -}
+
+      {-
+  patch : ∀ {n} {f t : Vec (A ⁇) n} (x : Vec A n)
+    → f ⊏ x → (p : Patch f t) → Vec A n
+  patch [] []⊏[] _ = []
+  patch (x ∷ []) pf I = x ∷ []
+  patch (x ∷ []) (⊙⊏ pf .x) (.x ⇔ to) = to ∷ []
+  patch (x ∷ xs) pf (I ∷+ px) = {!!}
+  patch (x ∷ xs) pf ((from ⇔ to) ∷+ px) = {!!}
+  patch (x ∷ xs) pf ((p ∷+ p₁) ∷+ px) = {!!}
+  patch (x ∷ xs) pf (⋀ x₁ x₂ x₃ x₄ p p₁ ∷+ px) = {!!}
+  patch (x ∷ xs) pf (⋙ x₁ x₂ x₃ p p₁ ∷+ px) = {!!}
+--    patch (x ∷ []) {!!} p ++ patch xs {!!} px 
+  patch (x ∷ xs) pf (⋀ x₁ x₂ x₃ x₄ p p₁) = {!!}
+  patch (x ∷ xs) pf (⋙ x₁ x₂ x₃ p p₁) = {!!}
+    -}
+
+module VecLikePatchTransposed2 (A : Set) where
+  
+  mutual
+    data Patch : (n : ℕ) → Set where
+      [] : Patch zero
+      ⟨_⇒_⟩∷_ : ∀ {n} → A → A → Patch n → Patch (succ n)
+      I∷_ : ∀ {n} → Patch n → Patch (succ n)
+      _⋀_ : ∀ {n} → (p₁ : Patch n) → (p₂ : Patch n)
+        → p₁ ∥ p₂ → Patch n
+    
+    data _∥_ : {n : ℕ} → Patch n → Patch n → Set where
+      
