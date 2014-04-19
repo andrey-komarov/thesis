@@ -17,6 +17,7 @@ module Data-Maybe where
   maybe b f (⊙ a) = f a
 
   
+  {-
 module TreeLikePatch (a : Set) where
 
   data Tree : Set where
@@ -390,6 +391,7 @@ module VecLikePatchTransposed (A : Set) where
       I∥I : I ∥ I
       _|⊹|_ : ∀ {n m}{pₗ₁ pₗ₂ : Patch n}{pᵣ₁ pᵣ₂ : Patch m} 
         → pₗ₁ ∥ pₗ₂ → pᵣ₁ ∥ pᵣ₂ → (pₗ₁ ⊹ pᵣ₁) ∥ (pₗ₂ ⊹ pᵣ₂)
+        -}
 
 module VecLikePatchTransposedIndexed (A : Set) where
 
@@ -592,6 +594,7 @@ module VecLikePatchTransposedIndexed (A : Set) where
     = ø⊏ (vpatch-lem-1 ≪≫ ⊏1 is/) b
   vpatch-lem-1 (ø≪≫⊙ a ≪≫) (⊙⊏ ⊏1 .a) (same/ø is/ .a) 
     = ⊙⊏ (vpatch-lem-1 ≪≫ ⊏1 is/) a
+  {- FIXME вот тут всё сломалось из-за ⊙∥⊙ -}
   vpatch-lem-1 (⊙≪≫⊙ a ≪≫) (⊙⊏ ⊏1 .a) (diff/⊙ is/ .a b .a) 
     = {!!}
 
@@ -651,3 +654,116 @@ module VecLikePatchTransposed2 (A : Set) where
     
     data _∥_ : {n : ℕ} → Patch n → Patch n → Set where
       
+
+{-
+module VecLikePatchTransposedIndexed2 (A : Set) where
+  
+  open Data-Maybe
+
+  module SingleCellPatch where
+    
+    data _≫1_≡_ {A : Set} : A ⁇ → A ⁇ → A ⁇ → Set where
+      ø≫1ø : ø ≫1 ø ≡ ø
+      ⊙≫1ø : (a : A) → ⊙ a ≫1 ø ≡ ⊙ a
+      ✶≫1⊙ : (a : A ⁇) (b : A) → a ≫1 ⊙ b ≡ ⊙ b
+      
+    data _≪≫1_≡_ {A : Set} : A ⁇ → A ⁇ → A ⁇ → Set where
+      ø≪≫1ø : ø ≪≫1 ø ≡ ø
+      ⊙≪≫1ø : (a : A) → ⊙ a ≪≫1 ø ≡ ⊙ a
+      ø≪≫1⊙ : (a : A) → ø ≪≫1 ⊙ a ≡ ⊙ a
+      
+    data _∥1_ {A : Set} : A ⁇ → A ⁇ → Set where
+      ø∥1ø : ø ∥1 ø
+      ⊙∥1ø : (a : A) → ⊙ a ∥1 ø
+      ø∥1⊙ : (a : A) → ø ∥1 ⊙ a
+      
+    data _=∥1_ {A : Set} : A ⁇ → A ⁇ → Set where
+      from∥ : {a b : A ⁇} → a ∥1 b → a =∥1 b
+      ⊙=∥1⊙ : (a : A) → ⊙ a =∥1 ⊙ a
+    
+    data _⊏1_ {A : Set} : A ⁇ → A → Set where
+      ø⊏1 : (a : A) → ø ⊏1 a
+      ⊙⊏1 : (a : A) → ⊙ a ⊏1 a
+      
+    data _is1_/_ {A B : Set} : (a b : A) (c : B ⁇) → Set where
+      same1/ø : (a : A) → a is1 a / ø
+      diff1/⊙ : (a b : A) (c : B) → a is1 b / ⊙ c
+      
+    data Patch1 : A ⁇ → A ⁇ → Set where
+      I : Patch1 ø ø
+      _⇔_ : (from to : A) → Patch1 (⊙ from) (⊙ to)
+      ∧1 : ∀ {f₁ t₁ f₂ t₂ f₃ t₃ : A ⁇}
+        → (f₁∥f₂ : f₁ ∥1 f₂) → (t₁∥t₂ : t₁ ∥1 t₂)
+        → (f₃-ok : f₁ ≪≫1 f₂ ≡ f₃) → (t₃-ok : t₁ ≪≫1 t₂ ≡ t₃)
+        → (p₁ : Patch1 f₁ t₁) → (p₂ : Patch1 f₂ t₂)
+        → Patch1 f₃ t₃
+      ⋙1 : ∀ {f₁ t₁ f₂ t₂ f₃ t₃ : A ⁇}
+        → (can : t₁ =∥1 f₂) -- очень плохо
+        → (f₃-ok : f₁ ≫1 f₂ ≡ f₃) → (t₃-ok : t₁ ≫1 t₂ ≡ t₃)
+        → (p₁ : Patch1 f₁ t₁) → (p₂ : Patch1 f₂ t₂)
+        → Patch1 f₃ t₃
+        
+    data _≃1_ {A B : Set} : A ⁇ → B ⁇ → Set where
+      ø≃1ø : ø ≃1 ø
+      ⊙≃1⊙ : (a : A) (b : B) → ⊙ a ≃1 ⊙ b
+      
+    ≃-≪≫-lem : ∀ {a1 a2 a3 b1 b2 b3 : A ⁇}
+      → a1 ≪≫1 a2 ≡ a3 → b1 ≪≫1 b2 ≡ b3
+      → a1 ≃1 b1 → a2 ≃1 b2 → a3 ≃1 b3
+    ≃-≪≫-lem ø≪≫1ø ø≪≫1ø ø≃1ø ø≃1ø = ø≃1ø
+    ≃-≪≫-lem (⊙≪≫1ø a) (⊙≪≫1ø a₁) (⊙≃1⊙ .a .a₁) ø≃1ø = ⊙≃1⊙ a a₁
+    ≃-≪≫-lem (ø≪≫1⊙ a) (ø≪≫1⊙ a₁) ø≃1ø (⊙≃1⊙ .a .a₁) = ⊙≃1⊙ a a₁
+    
+    ≃-≫-lem : ∀ {a1 a2 a3 b1 b2 b3 : A ⁇}
+      → a1 ≫1 a2 ≡ a3 → b1 ≫1 b2 ≡ b3
+      → a1 ≃1 b1 → a2 ≃1 b2 → a3 ≃1 b3
+    ≃-≫-lem ø≫1ø ø≫1ø ø≃1ø ø≃1ø = ø≃1ø
+    ≃-≫-lem (⊙≫1ø a) (⊙≫1ø a₁) (⊙≃1⊙ .a .a₁) ø≃1ø = ⊙≃1⊙ a a₁
+    ≃-≫-lem (✶≫1⊙ .ø b) (✶≫1⊙ .ø b₁) ø≃1ø (⊙≃1⊙ .b .b₁) = ⊙≃1⊙ b b₁
+    ≃-≫-lem (✶≫1⊙ .(⊙ a) b) (✶≫1⊙ .(⊙ b₂) b₁) (⊙≃1⊙ a b₂) (⊙≃1⊙ .b .b₁) = ⊙≃1⊙ b b₁
+    
+    Patch1-lem : ∀ {f t} → Patch1 f t → f ≃1 t
+    Patch1-lem I = ø≃1ø
+    Patch1-lem (from ⇔ to) = ⊙≃1⊙ from to
+    Patch1-lem (∧1 f₁∥f₂ t₁∥t₂ f₃-ok t₃-ok p p₁) =
+      ≃-≪≫-lem f₃-ok t₃-ok (Patch1-lem p) (Patch1-lem p₁)
+    Patch1-lem (⋙1 can f₃-ok t₃-ok p p₁) = 
+      ≃-≫-lem f₃-ok t₃-ok (Patch1-lem p) (Patch1-lem p₁)
+        
+    vpatch-lem-1 : ∀ {a b c : A ⁇}{x : A}
+      → a ≪≫1 b ≡ c → c ⊏1 x → a ⊏1 x
+    vpatch-lem-1 ø≪≫1ø (ø⊏1 x) = ø⊏1 x
+    vpatch-lem-1 {x = x} (⊙≪≫1ø .x) (⊙⊏1 .x) = ⊙⊏1 x
+    vpatch-lem-1 {x = x} (ø≪≫1⊙ .x) (⊙⊏1 .x) = ø⊏1 x
+    
+    vpatch-lem-2 : ∀ {a b c : A ⁇}{x : A}
+      → a ≫1 b ≡ c → c ⊏1 x → a ⊏1 x
+    vpatch-lem-2 = {!!}
+
+    vpatch : {f t : A ⁇} (x : A)
+      → f ⊏1 x → (p : Patch1 f t) → Σ A λ y → (t ⊏1 y) × (x is1 y / f)
+    vpatch x pf I = x , pf , same1/ø x
+    vpatch x (⊙⊏1 .x) (.x ⇔ to) = to , ⊙⊏1 to , diff1/⊙ x to x
+    vpatch x pf (∧1 f₁∥f₂ t₁∥t₂ f₃-ok t₃-ok p p₁) with vpatch x (vpatch-lem-1 f₃-ok pf) p 
+    vpatch .s₁ pf (∧1 ø∥1ø ø∥1ø ø≪≫1ø ø≪≫1ø p p₁) | s₁ , ø⊏1 .s₁ , same1/ø .s₁ = s₁ , pf , same1/ø s₁
+    vpatch .s₁ (ø⊏1 .s₁) (∧1 ø∥1ø (ø∥1⊙ a) ø≪≫1ø (ø≪≫1⊙ .a) p p₁) | s₁ , ø⊏1 .s₁ , same1/ø .s₁ with Patch1-lem p₁
+    vpatch .s₁ (ø⊏1 .s₁) (∧1 ø∥1ø (ø∥1⊙ a) ø≪≫1ø (ø≪≫1⊙ .a) p p₁) | s₁ , ø⊏1 .s₁ , same1/ø .s₁ | ()
+    vpatch .s₁ pf (∧1 (ø∥1⊙ a) ø∥1ø f₃-ok t₃-ok p p₁) | s₁ , ø⊏1 .s₁ , same1/ø .s₁ with Patch1-lem p₁
+    ... | ()
+    vpatch .s₁ pf (∧1 (ø∥1⊙ a) (ø∥1⊙ a₁) (ø≪≫1⊙ .a) (ø≪≫1⊙ .a₁) p p₁) | s₁ , ø⊏1 .s₁ , same1/ø .s₁ = a₁ , ⊙⊏1 a₁ , diff1/⊙ s₁ a₁ a
+    vpatch x pf (∧1 (⊙∥1ø .c) ø∥1ø (⊙≪≫1ø .c) ø≪≫1ø p p₁) | s₁ , ø⊏1 .s₁ , diff1/⊙ .x .s₁ c = c , ø⊏1 c , diff1/⊙ x c c
+    vpatch x pf (∧1 (⊙∥1ø .c) (ø∥1⊙ a) (⊙≪≫1ø .c) (ø≪≫1⊙ .a) p p₁) | s₁ , ø⊏1 .s₁ , diff1/⊙ .x .s₁ c = a , ⊙⊏1 a , diff1/⊙ x a c
+    vpatch .s₁ pf (∧1 ø∥1ø (⊙∥1ø .s₁) ø≪≫1ø (⊙≪≫1ø .s₁) p p₁) | s₁ , ⊙⊏1 .s₁ , same1/ø .s₁ with Patch1-lem p
+    ... | ()
+    vpatch .s₁ pf (∧1 (ø∥1⊙ a) (⊙∥1ø .s₁) (ø≪≫1⊙ .a) (⊙≪≫1ø .s₁) p p₁) | s₁ , ⊙⊏1 .s₁ , same1/ø .s₁ with Patch1-lem p
+    ... | ()
+    vpatch x pf (∧1 (⊙∥1ø .c) (⊙∥1ø .s₁) (⊙≪≫1ø .c) (⊙≪≫1ø .s₁) p p₁) | s₁ , ⊙⊏1 .s₁ , diff1/⊙ .x .s₁ c = s₁ , ⊙⊏1 s₁ , diff1/⊙ x s₁ c
+    vpatch x pf (⋙1 can f₃-ok t₃-ok p p₁) with vpatch x {!!} p
+    ... | s₁ , p1 , p2 = {!!}
+
+    -}
+
+
+
+
+
