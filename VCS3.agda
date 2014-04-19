@@ -139,25 +139,30 @@ module With-⋀-and-⋙ (A : Set) where
     (b⋙?c'' : b ⋙? c'')
     → (((a ∧ₚ b) a∥b) ⋙ₚ c) a∧b⋙?c 
       ⟷ ((a ⋙ₚ c') a⋙?c' ∧ₚ (b ⋙ₚ c'') b⋙?c'') a∥b
-  ∧-⋙-lem O O O O []∥[] .O c=c'∧c'' []∥[] O⋙?O O⋙?O O⋙?O [] []⊏[] []⊏[] = refl
-  ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⊥∷ a) (⊥∷ b) (⊥∥⊥ c'∥c'') (⊥∷ c) c=c'∧c'' (⊥∥⊥ a∥b) (⊥⋙?⊥ a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊥⋙?⊥ b⋙c'') (x ∷ x₁) (⊥⊏ .x a∧b⋙c⊏x) (⊥⊏ .x a⋙c'∧b⋙c''⊏x) 
-    = vec-prepend x (∧-⋙-lem c' c'' a b c'∥c'' c (strip-⊥⊥ x c=c'∧c'') a∥b a∧b⋙?c a⋙?c' b⋙c'' x₁ a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x)
-  ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⊥∷ a) (⟨ .x ⇒ to ⟩∷ b) (⊥∥⊥ c'∥c'') (⊥∷ c) c=c'∧c'' (⊥∥⊤ a∥b) (⊤⋙?⊥ .x .to a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊤⋙?⊥ .x .to b⋙c'') (x ∷ x₁) (⊤⊏ .x .to a∧b⋙c⊏x) (⊤⊏ .x .to a⋙c'∧b⋙c''⊏x) 
-    = vec-prepend to (∧-⋙-lem c' c'' a b c'∥c'' c (strip-⊥⊥ x c=c'∧c'') a∥b a∧b⋙?c a⋙?c' b⋙c'' x₁ a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x)
-  ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⟨ .x ⇒ to ⟩∷ a) (⊥∷ b) (⊥∥⊥ c'∥c'') (⊥∷ c) c=c'∧c'' (⊤∥⊥ a∥b) (⊤⋙?⊥ .x .to a∧b⋙?c) (⊤⋙?⊥ .x .to a⋙?c') (⊥⋙?⊥ b⋙c'') (x ∷ x₁) (⊤⊏ .x .to a∧b⋙c⊏x) (⊤⊏ .x .to a⋙c'∧b⋙c''⊏x) 
-    = vec-prepend to (∧-⋙-lem c' c'' a b c'∥c'' c (strip-⊥⊥ x c=c'∧c'') a∥b a∧b⋙?c a⋙?c' b⋙c'' x₁ a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x)
-  ∧-⋙-lem (⊥∷ c') (⟨ from ⇒ to ⟩∷ c'') (⊥∷ a) (⊥∷ b) (⊥∥⊤ c'∥c'') c c=c'∧c'' (⊥∥⊥ a∥b) a∧b⋙?c a⋙?c' () x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x
-  ∧-⋙-lem (⊥∷ c') (⟨ .x ⇒ to ⟩∷ c'') (⊥∷ a) (⟨ from₁ ⇒ .x ⟩∷ b) (⊥∥⊤ c'∥c'') (⟨ .x ⇒ .to₂ ⟩∷ p₂) c=c'∧c'' (⊥∥⊤ a∥b) (⊤⋙?⊤ .from₁ .x to₂ a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊤⋙?⊤ .from₁ .x .to b⋙c'') (x ∷ x₁) (⊤⊏ .x .to₂ a∧b⋙c⊏x) (⊤⊏ .x .to a⋙c'∧b⋙c''⊏x) 
-    = {!!}
-  ∧-⋙-lem (⊥∷ c') (⟨ from ⇒ to ⟩∷ c'') (⟨ from₁ ⇒ to₁ ⟩∷ a) (⊥∷ b) c'∥c'' c c=c'∧c'' a∥b a∧b⋙?c a⋙?c' b⋙c'' x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x = {!!}
-  ∧-⋙-lem (⊥∷ c') (⟨ from ⇒ to ⟩∷ c'') (⟨ from₁ ⇒ to₁ ⟩∷ a) (⟨ from₂ ⇒ to₂ ⟩∷ b) c'∥c'' c c=c'∧c'' a∥b a∧b⋙?c a⋙?c' b⋙c'' x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x = {!!}
-  ∧-⋙-lem (⟨ from ⇒ to ⟩∷ c') (⊥∷ c'') (⊥∷ a) (⊥∷ b) c'∥c'' c c=c'∧c'' a∥b a∧b⋙?c a⋙?c' b⋙c'' x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x = {!!}
-  ∧-⋙-lem (⟨ from ⇒ to ⟩∷ c') (⊥∷ c'') (⊥∷ a) (⟨ from₁ ⇒ to₁ ⟩∷ b) c'∥c'' c c=c'∧c'' a∥b a∧b⋙?c a⋙?c' b⋙c'' x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x = {!!}
-  ∧-⋙-lem (⟨ from ⇒ to ⟩∷ c') (⊥∷ c'') (⟨ from₁ ⇒ to₁ ⟩∷ a) (⊥∷ b) c'∥c'' c c=c'∧c'' a∥b a∧b⋙?c a⋙?c' b⋙c'' x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x = {!!}
-  ∧-⋙-lem (⟨ from ⇒ to ⟩∷ c') (⊥∷ c'') (⟨ from₁ ⇒ to₁ ⟩∷ a) (⟨ from₂ ⇒ to₂ ⟩∷ b) c'∥c'' c c=c'∧c'' a∥b a∧b⋙?c a⋙?c' b⋙c'' x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x = {!!}
-  ∧-⋙-lem (⟨ from ⇒ to ⟩∷ c') (⟨ from₁ ⇒ to₁ ⟩∷ c'') (⊥∷ a) (⊥∷ b) c'∥c'' c c=c'∧c'' a∥b a∧b⋙?c a⋙?c' b⋙c'' x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x = {!!}
-  ∧-⋙-lem (⟨ from ⇒ to ⟩∷ c') (⟨ from₁ ⇒ to₁ ⟩∷ c'') (⊥∷ a) (⟨ from₂ ⇒ to₂ ⟩∷ b) c'∥c'' c c=c'∧c'' a∥b a∧b⋙?c a⋙?c' b⋙c'' x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x = {!!}
-  ∧-⋙-lem (⟨ from ⇒ to ⟩∷ c') (⟨ from₁ ⇒ to₁ ⟩∷ c'') (⟨ from₂ ⇒ to₂ ⟩∷ a) (⊥∷ b) c'∥c'' c c=c'∧c'' a∥b a∧b⋙?c a⋙?c' b⋙c'' x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x = {!!}
-  ∧-⋙-lem (⟨ from ⇒ to ⟩∷ c') (⟨ from₁ ⇒ to₁ ⟩∷ c'') (⟨ from₂ ⇒ to₂ ⟩∷ a) (⟨ from₃ ⇒ to₃ ⟩∷ b) c'∥c'' c c=c'∧c'' a∥b a∧b⋙?c a⋙?c' b⋙c'' x a∧b⋙c⊏x a⋙c'∧b⋙c''⊏x = {!!}
     -}
+    
+
+  -- c = c' ∧ c'' ⇒ (a ∧ b) ⋙ c ⟷ (a ⋙ c') ∧ (b ⋙ c'')
+  -- Хорошая формулировка
+  ∧-⋙-lem : ∀ {n} {fᵃ fᵇ fᶜ' fᶜ'' : Form n}
+    (c' : Patch fᶜ')(c'' : Patch fᶜ'')
+    (a : Patch fᵃ)(b : Patch fᵇ)
+    (c'∥c'' : fᶜ' ∥ fᶜ'') 
+    (a∥b : fᵃ ∥ fᵇ)
+    (a∧b⋙?c : (a ∧ₚ b) a∥b ⋙? ((c' ∧ₚ c'') c'∥c''))
+    (a⋙?c' : a ⋙? c')
+    (b⋙?c'' : b ⋙? c'')
+    → (((a ∧ₚ b) a∥b) ⋙ₚ ((c' ∧ₚ c'') c'∥c'')) a∧b⋙?c 
+      ⟷ ((a ⋙ₚ c') a⋙?c' ∧ₚ (b ⋙ₚ c'') b⋙?c'') a∥b
+  ∧-⋙-lem O O O O []∥[] []∥[] O⋙?O O⋙?O O⋙?O [] []⊏[] []⊏[] = refl
+  ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⊥∷ a) (⊥∷ b) (⊥∥⊥ c'∥c'') (⊥∥⊥ a∥b) (⊥⋙?⊥ a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊥⋙?⊥ b⋙?c'') (x ∷ x₁) (⊥⊏ .x p₁⊏x) (⊥⊏ .x p₂⊏x) 
+    = vec-prepend x (∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙?c'' x₁ p₁⊏x p₂⊏x)
+  ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⊥∷ a) (⟨ .x ⇒ to ⟩∷ b) (⊥∥⊥ c'∥c'') (⊥∥⊤ a∥b) (⊤⋙?⊥ .x .to a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊤⋙?⊥ .x .to b⋙?c'') (x ∷ x₁) (⊤⊏ .x .to p₁⊏x) (⊤⊏ .x .to p₂⊏x) 
+    = vec-prepend to (∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙?c'' x₁ p₁⊏x p₂⊏x)
+  ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⟨ .x ⇒ to ⟩∷ a) (⊥∷ b) (⊥∥⊥ c'∥c'') (⊤∥⊥ a∥b) (⊤⋙?⊥ .x .to a∧b⋙?c) (⊤⋙?⊥ .x .to a⋙?c') (⊥⋙?⊥ b⋙?c'') (x ∷ x₁) (⊤⊏ .x .to p₁⊏x) (⊤⊏ .x .to p₂⊏x) 
+    = vec-prepend to (∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙?c'' x₁ p₁⊏x p₂⊏x)
+  ∧-⋙-lem (⊥∷ c') (⟨ .x ⇒ to ⟩∷ c'') (⊥∷ a) (⟨ from ⇒ .x ⟩∷ b) (⊥∥⊤ c'∥c'') (⊥∥⊤ a∥b) (⊤⋙?⊤ .from .x .to a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊤⋙?⊤ .from .x .to b⋙?c'') (x ∷ x₁) (⊤⊏ .x .to p₁⊏x) (⊤⊏ .x .to p₂⊏x) 
+    = vec-prepend to (∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙?c'' x₁ p₁⊏x p₂⊏x)
+  ∧-⋙-lem (⟨ .x ⇒ to ⟩∷ c') (⊥∷ c'') (⟨ from ⇒ .x ⟩∷ a) (⊥∷ b) (⊤∥⊥ c'∥c'') (⊤∥⊥ a∥b) (⊤⋙?⊤ .from .x .to a∧b⋙?c) (⊤⋙?⊤ .from .x .to a⋙?c') (⊥⋙?⊥ b⋙?c'') (x ∷ x₁) (⊤⊏ .x .to p₁⊏x) (⊤⊏ .x .to p₂⊏x) 
+    = vec-prepend to (∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙?c'' x₁ p₁⊏x p₂⊏x)
 
