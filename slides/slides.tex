@@ -1,0 +1,219 @@
+\section{Великие планы}
+
+\begin{frame}{Общие слова, план}
+  \begin{itemize}
+  \item Сделать абстрактную VCS.
+  \item Понять, что вообще можно хранить в такой VCS.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Типы}
+  \begin{itemize}
+  \item $D$~--- тип, над которым будет строиться VCS:
+    \begin{itemize}
+    \item байтовый вектор.
+    \item дерево.
+    \item файл.
+    \item UNIX patch.
+    \end{itemize}
+  \item $P(D)$~-- <<простые>> патчи для $D$.
+    \begin{itemize}
+    \item для байтового вектора~--- список позиций, в которых замены
+      и, собственно, замены.
+    \end{itemize}
+  \item $R$~--- собственно, \emph{репозиторий}, он же \emph{ветка}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Поддерживаемые операции}
+  \begin{itemize}
+  \item $Lift \cdot : P(D) \to R$
+    \begin{itemize}
+    \item Простой патч можно рассматривать как ветку.
+    \end{itemize}
+  \item $(\cdot \wedge \cdot) : R \to R \to R$
+    \begin{itemize}
+    \item \emph{merge} двух веток, в случае отсутствия каких-либо конфликтов.
+    \end{itemize}
+  \item $(\cdot \ggg \cdot) : R \to R \to R$
+    \begin{itemize}
+    \item \emph{merge} двух веток, возможны конфликты. В $r_1 \ggg r_2$
+      сначала применяется $r_1$, затем~--- $r_2$.
+    \end{itemize}
+  \item $(\cdot \vee \cdot) : R \to R \to R$
+    \begin{itemize}
+    \item \emph{branch}, создание нового репозитория из этих двух веток.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Эквивалентность}
+  \begin{definition}
+    Репозитории $r_1$ и $r_2$ \emph{эквивалентны} $r_1 \equiv r_2$,
+    если не существует входных данных $d$, на которых они ведут себя
+    по-разному. (тут могло бы быть как-то более формально, но не до
+    конца понятно, как именно).
+  \end{definition}
+  
+  Например, неважно, в каком порядке применять патчи $p_1 = \langle a
+  \to b @ 0\rangle$ и $p_2 = \langle c \to d @ 1\rangle$. Значит,
+  здесь $p_1 \ggg p_2 \equiv p_2 \ggg p_1$
+\end{frame}
+
+\begin{frame}{Свойства}
+  \begin{itemize}
+  \item $a \vee a \equiv a$
+  \item $a \wedge a \equiv a$
+  \item $(a \wedge b) \vee (a \wedge c) \equiv a \wedge (b \vee c)$
+  \item $(a \vee b) \wedge (a \vee c) \equiv a \vee (b \wedge c)$
+  \item $a$ не конфликтует с $b$ $\Rightarrow$ $a \wedge b \equiv a
+    \ggg b$
+  \item $(a \ggg c')$ не конфликтует с $(b \ggg c'')$, $c = c' \wedge
+    c''$ $\Rightarrow$ $(a \wedge b) \ggg c \equiv (a \ggg c') \wedge
+    (b \ggg c'')$
+  \end{itemize}
+\end{frame}
+
+
+\section{Что сделано}
+
+\begin{frame}{Урежем всё, что можно}
+  \begin{itemize}
+  \item Выбросим $(\cdot \vee \cdot)$ и $(\cdot \ggg \cdot)$
+  \item Оставим вместо носителя $D$ что-то конкретное:
+    \begin{itemize}
+    \item вектор фиксированной длины.
+    \item двоичное дерево.
+    \end{itemize}
+  \item Заменим тип $(\cdot \wedge \cdot) : P(D) \to P(D) \to P(D)$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\emph{Форма} патча}
+  \begin{definition}
+    Введём для патча однозначно определяемую \emph{форму}~--- нечто,
+    описывающее, что именно сломает этот патч.
+  \end{definition}
+  
+  \begin{itemize}
+  \item Для вектора длины $n$ форма~--- вектор булевых переменных
+    длины $n$, который говорит, есть ли замена символа в
+    соответствующей позиции.
+  \item Для двоичного дерева будет описано ниже.
+  \end{itemize}
+\end{frame}
+
+\subsection{Вектор}
+
+\begin{frame}{Вектор}
+  \begin{itemize}
+  \item Носитель $D$~--- вектор длины $n$.
+  \item \emph{Форма}~--- вектор булевых переменных длины $n$.
+  \item Простой патч $P(D)$~--- про каждую позицию, для которой в
+    форме стоит \texttt{True} известно, какой символ там должен стоять
+    и какой символ там будет стоять после применения этого патча.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Вектор. Реализованные операции (1)}
+  \begin{itemize}
+  \item Дататайп, доказывающий \emph{совместимость} форм
+    \begin{itemize}
+    \item патчи совместимы, когда множества мест, содержащих
+      \texttt{True} в их формах не пересекаются.
+    \end{itemize}
+  \item Дататайп, доказывающий возможность применить заданный патч к
+    заданному входному вектору
+    \begin{itemize}
+    \item можно применить, когда во входном векторе на местах, в
+      которых в форме \texttt{True}, стоит то, что ожидается патчем.
+    \end{itemize}
+  \item Функция склеивания двух совместимых форм.
+  \item Функция применения патча ко входному вектору.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Вектор. Реализованные операции (2)}
+  \begin{itemize}
+  \item $(\cdot \wedge \cdot)$~--- склеивание двух непересекающихся
+    патчей в один.
+  \item Отношение эквивалентности на патчах.
+    \begin{itemize}
+    \item Два патча эквивалентны, если на пересечении областей
+      определения дают одинаковые результаты.
+    \end{itemize}
+  \item Доказательства коммутативности и ассоциативности $(\cdot
+    \wedge \cdot)$.
+    \begin{itemize}
+    \item $p_1 \wedge p_2 \equiv p_2 \wedge p_1$
+    \item $(p_1 \wedge p_2) \wedge p_3 \equiv p_1 \wedge (p_2 \wedge p_3)$
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\subsection{Дерево}
+
+\begin{frame}{Дерево}
+  \begin{itemize}
+  \item Носитель $D$~--- двоичные деревья со значениями в листьях.
+  \item \emph{Форма}~--- (Под)дерево, у которого какие-то листья
+    помечены как <<важные>>, а остальные~--- как <<не важные>>.
+  \item Простой патч $P(D)$~--- про каждую <<важную>> позицию формы
+    известно, какое дерево должно висеть под ней и на что оно будет
+    заменено. Под <<не важными>> вершинами висит что угодно.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Дерево. Реализованные операции (1)}
+  То же самое, что для векторов.
+  \begin{itemize}
+  \item Дататайп, доказывающий \emph{совместимость} форм
+    \begin{itemize}
+    \item патчи совместимы, когда множества мест, содержащих
+      \texttt{True} в их формах не пересекаются.
+    \end{itemize}
+  \item Дататайп, доказывающий возможность применить заданный патч к
+    заданному входному вектору
+    \begin{itemize}
+    \item можно применить, когда под всеми <<важными>> вершинами формы
+      висит то, что ожидается патчем.
+    \end{itemize}
+  \item Функция склеивания двух совместимых форм.
+  \item Функция применения патча ко входному вектору.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Дерево. Реализованные операции (2)}
+  То же самое, что для векторов.
+  \begin{itemize}
+  \item $(\cdot \wedge \cdot)$~--- склеивание двух непересекающихся
+    патчей в один.
+  \item Отношение эквивалентности на патчах.
+    \begin{itemize}
+    \item Два патча эквивалентны, если на пересечении областей
+      определения дают одинаковые результаты.
+    \end{itemize}
+  \item Доказательства коммутативности и ассоциативности $(\cdot
+    \wedge \cdot)$.
+    \begin{itemize}
+    \item $p_1 \wedge p_2 \equiv p_2 \wedge p_1$
+    \item $(p_1 \wedge p_2) \wedge p_3 \equiv p_1 \wedge (p_2 \wedge p_3)$
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{Что дальше?}
+
+\begin{frame}{Что дальше?}
+  \begin{itemize}
+  \item Прикрутить $(\cdot \vee \cdot)$. Это примерно понятно, как
+    сделать.
+  \item Прикрутить $(\cdot \ggg \cdot)$. Это не понятно, как делать.
+  \item Предъявить чёткие требования к $D$, $P(D)$, $R$, чтобы всё это
+    работало.
+    \begin{itemize}
+    \item Форма~--- что-то, похожее на (полу?)решётку.
+    \item ...
+    \end{itemize}
+  \end{itemize}
+\end{frame}
