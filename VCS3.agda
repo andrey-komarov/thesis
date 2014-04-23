@@ -106,6 +106,10 @@ module With-⋀-and-⋙ (A : Set) where
   _⟷_ {n} p₁ p₂ = ∀ (x : Vec A n) → (p₁⊏x : p₁ ⊏ x) → (p₂⊏x : p₂ ⊏ x) 
     → patch p₁ x p₁⊏x ≡ patch p₂ x p₂⊏x
     
+  ⟷-bad : (a b c d : A) → (a ≠ b) → (⟨ a ⇒ c ⟩∷ O) ⟷ (⟨ b ⇒ d ⟩∷ O)
+  ⟷-bad .x .x c d a≠b (x ∷ []) (⊤⊏ .x .c []⊏[]) (⊤⊏ .x .d []⊏[]) = 
+    ⊥-elim (a≠b refl)
+    
   vec-strip : ∀ {n} {a₁ a₂ : A} {ax₁ ax₂ : Vec A n}
     → (a₁ ∷ ax₁) ≡ (a₂ ∷ ax₂) → ax₁ ≡ ax₂
   vec-strip refl = refl
@@ -166,3 +170,22 @@ module With-⋀-and-⋙ (A : Set) where
   ∧-⋙-lem (⟨ .x ⇒ to ⟩∷ c') (⊥∷ c'') (⟨ from ⇒ .x ⟩∷ a) (⊥∷ b) (⊤∥⊥ c'∥c'') (⊤∥⊥ a∥b) (⊤⋙?⊤ .from .x .to a∧b⋙?c) (⊤⋙?⊤ .from .x .to a⋙?c') (⊥⋙?⊥ b⋙?c'') (x ∷ x₁) (⊤⊏ .x .to p₁⊏x) (⊤⊏ .x .to p₂⊏x) 
     = vec-prepend to (∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙?c'' x₁ p₁⊏x p₂⊏x)
 
+
+  -- (p₁ ⋙ p₂) ⋙ p₃ ⟷ p₁ ⋙ (p₂ ⋙ p₃)
+  ⋙-assoc : ∀ {n}{f₁ f₂ f₃ : Form n}{p₁ : Patch f₁}{p₂ : Patch f₂}{p₃ : Patch f₃}
+    → (p₁⋙?p₂ : p₁ ⋙? p₂)
+    → ([p₁⋙ₚp₂]⋙?p₃ : (p₁ ⋙ₚ p₂) p₁⋙?p₂ ⋙? p₃)
+    → (p₂⋙?p₃ : p₂ ⋙? p₃)
+    → (p₁⋙?[p₂⋙ₚp₃] : p₁ ⋙? (p₂ ⋙ₚ p₃) p₂⋙?p₃)
+    → (((p₁ ⋙ₚ p₂) p₁⋙?p₂) ⋙ₚ p₃) [p₁⋙ₚp₂]⋙?p₃
+      ⟷
+      (p₁ ⋙ₚ (p₂ ⋙ₚ p₃) p₂⋙?p₃) p₁⋙?[p₂⋙ₚp₃]
+  ⋙-assoc O⋙?O O⋙?O O⋙?O O⋙?O [] []⊏[] []⊏[] = refl
+  ⋙-assoc (⊥⋙?⊥ p₁⋙?p₂) (⊥⋙?⊥ [p₁⋙?p₂]⋙?p₃) (⊥⋙?⊥ p₂⋙?p₃) (⊥⋙?⊥ p₁⋙?[p₂⋙ₚp₃]) (x ∷ x₁) (⊥⊏ .x p₁⊏x) (⊥⊏ .x p₂⊏x) = 
+    vec-prepend x (⋙-assoc p₁⋙?p₂ [p₁⋙?p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙ₚp₃] x₁ p₁⊏x p₂⊏x)
+  ⋙-assoc (⊤⋙?⊥ .x to p₁⋙?p₂) (⊤⋙?⊥ .x .to [p₁⋙?p₂]⋙?p₃) (⊥⋙?⊥ p₂⋙?p₃) (⊤⋙?⊥ .x .to p₁⋙?[p₂⋙ₚp₃]) (x ∷ x₁) (⊤⊏ .x .to p₁⊏x) (⊤⊏ .x .to p₂⊏x) = 
+    vec-prepend to (⋙-assoc p₁⋙?p₂ [p₁⋙?p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙ₚp₃] x₁ p₁⊏x p₂⊏x)
+  ⋙-assoc (⊤⋙?⊤ from .x to₂ p₁⋙?p₂) (⊤⋙?⊥ .x .to₂ [p₁⋙?p₂]⋙?p₃) (⊤⋙?⊥ .x .to₂ p₂⋙?p₃) (⊤⋙?⊤ .from .x .to₂ p₁⋙?[p₂⋙ₚp₃]) (x ∷ x₁) (⊤⊏ .x .to₂ p₁⊏x) (⊤⊏ .x .to₂ p₂⊏x) = 
+    vec-prepend to₂ (⋙-assoc p₁⋙?p₂ [p₁⋙?p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙ₚp₃] x₁ p₁⊏x p₂⊏x)
+  ⋙-assoc (⊤⋙?⊤ from .x .x p₁⋙?p₂) (⊤⋙?⊤ .x .x to₂ [p₁⋙?p₂]⋙?p₃) (⊤⋙?⊤ .x .x .to₂ p₂⋙?p₃) (⊤⋙?⊤ .from .x .to₂ p₁⋙?[p₂⋙ₚp₃]) (x ∷ x₁) (⊤⊏ .x .to₂ p₁⊏x) (⊤⊏ .x .to₂ p₂⊏x) = 
+    vec-prepend to₂ (⋙-assoc p₁⋙?p₂ [p₁⋙?p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙ₚp₃] x₁ p₁⊏x p₂⊏x)
