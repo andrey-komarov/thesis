@@ -1,0 +1,105 @@
+\documentclass[a4paper]{report}
+
+\usepackage[T2B]{fontenc}
+\usepackage[english,russian]{babel}
+\usepackage[backend=biber,bibencoding=utf8,sorting=none,sortcites=true,bibstyle=sty/gost71,maxnames=99,citestyle=numeric-comp,babel=other]{biblatex}
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[pdftex]{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{sty/dbl12}
+\usepackage{sty/rac}
+\usepackage{epigraph}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\tikzset{
+  treenode/.style = {align=center, inner sep=0pt, text centered,
+    font=\sffamily},
+  tree_v/.style = {treenode, circle, black, draw=black,
+    text width=1.5em, very thick},
+  subtree/.style = {treenode, rectangle, draw=black,
+    minimum width=1.5em, minimum height=1.5em}
+}
+
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Теорема}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Определение}
+
+% Redefine margins and other page formatting
+
+\setlength{\oddsidemargin}{0.5in}
+
+\binoppenalty=10000
+\relpenalty=10000
+
+\addbibresource{report.bib}
+
+\defbibenvironment{bibliography} {\list
+  {\printfield[labelnumberwidth]{labelnumber}.}
+  {\setlength{\labelwidth}{2\labelnumberwidth}%
+    \setlength{\leftmargin}{\labelwidth}%
+    \setlength{\labelsep}{\biblabelsep}%
+    \addtolength{\leftmargin}{\labelsep}%
+    \setlength{\itemsep}{\bibitemsep}%
+    \setlength{\parsep}{\bibparsep}}%
+  \renewcommand*{\makelabel}[1]{\hss##1}} {\endlist} {\item}
+
+
+\begin{document}
+
+\pagestyle{title}
+
+\begin{center}
+  Санкт Петербургский национальный исследовательский университет\\
+  информационных технологий механики и оптики\\
+  \hrulefill
+ 
+\vspace{2cm}
+
+Факультет информационных технологий и программирования
+
+Кафедра компьютерных технологий
+
+\vspace{3cm}
+
+{\Large Комаров Андрей Валерьевич}
+
+\vspace{2cm}
+
+\vbox{\LARGE\bfseries Аксиоматизация системы контроля версий в
+  формализме зависимых типов }
+
+\vspace{4cm}
+
+{\Large Научный руководитель: ассистент кафедры ТП Я.~М.~Малаховски}
+
+\vspace{6cm}
+
+Санкт-Петербург\\ \today
+\end{center}
+
+
+\newpage
+\pagestyle{plain}
+
+\tableofcontents
+
+% Chapters
+\startthechapters
+\input{chapters/intro.tex}
+\input{chapters/chapter1.tex}
+\input{chapters/chapter2.tex}
+\input{chapters/chapter3.tex}
+\input{chapters/outro.tex}
+
+\printbibliography
+
+\end{document}
