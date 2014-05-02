@@ -17,15 +17,8 @@
 
 \usepackage{tikz}
 \usetikzlibrary{arrows,positioning}
-\tikzset{
-  treenode/.style = {align=center, inner sep=0pt, text centered,
-    font=\sffamily},
-  tree_v/.style = {treenode, circle, black, draw=black,
-    text width=1.5em, very thick},
-  subtree/.style = {treenode, rectangle, draw=black,
-    minimum width=1.5em, minimum height=1.5em}
-}
-
+\tikzset{context/.style={circle, draw=black, minimum size=1cm}}
+\tikzset{patch/.style={fill=white}}
 
 \theoremstyle{plain}
 \newtheorem{theorem}{Теорема}
