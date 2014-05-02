@@ -141,9 +141,57 @@ ${}^b{A^{-1}}^a$ такой, что ${\cal E}({}^aA^b(A^{-1})^a) = {\cal
 и $q = $ <<удаление пятой строки файла $f$>> коммутируют, при этом, $p
 = p'$, а $q = q'$. 
 
-Рассмотрим более подробно более сложный пример коммутации. 
+\subsection{Merge}
+
+Пусть в некоторый момент времени у двух различных пользователей
+репозиторий находился в состоянии $a$, и они решили одновременно
+внести правки в один и тот же файл. 
 
 
+\tikzset{context/.style={circle, draw=black, minimum size=1cm}}
+\tikzset{content/.style={fill=white}}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[>=stealth,thick]
+    \node[context] (a) [label=right:{
+      \begin{tabular}{|r|l|}
+        \hline
+        1: & super \\
+        2: & cool \\
+        3: & text \\
+        \hline
+      \end{tabular}
+    }] {$a$}; 
+
+    \node[context] (b) [below left=of a, label=left:{
+      \begin{tabular}{|r|l|}
+        \hline
+        1: & super \\
+        2: & cool \\
+        3: & text \\
+        \textbf{4}: & \textbf{here} \\
+        \hline
+      \end{tabular}
+    }] {$b$};
+    \node[context] (c) [below right=of b, label=right:{
+      \begin{tabular}{|r|l|}
+        \hline
+        1: & super \\
+        \textbf{2:} & \textbf{mega} \\
+        3: & cool \\
+        4: & text \\
+        5: & here \\
+        \hline
+      \end{tabular}
+    }] {$c$};
+    
+    \draw[->] (a) to node[content] {$p$: +``here'':3} (b);
+    \draw[->] (b) to node[content]{$q$: +``mega'':1} (c);
+  \end{tikzpicture}
+  \caption{ля-ля}
+  \label{fig:merge-before}
+\end{figure}
 
 
 \section{Выводы по главе \ref{chapter1}}
