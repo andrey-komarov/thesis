@@ -309,6 +309,8 @@ q', p'$, $p = p'$ и $q = q'$. Однако, всё ещё ${\cal E}(p) = {\cal
 
 \subsection{Merge}
 
+\subsubsection{Merge двух патчей}
+
 Пусть в некоторый момент времени у двух различных пользователей
 репозиторий находился в состоянии $a$, и они решили одновременно
 внести правки в один и тот же файл. С первого взгляда может
@@ -388,5 +390,64 @@ q', p'$, $p = p'$ и $q = q'$. Однако, всё ещё ${\cal E}(p) = {\cal
   \caption{Коммутация $p^{-1}$ и $q$}
   \label{fig:merge}
 \end{figure}
+
+\subsubsection{Merge множества патчей}
+
+Проведённые выше размышления позволяют сделать из \emph{двух}
+параллельных патчей последовательные. Но что делать, если каждый из
+авторов сделал более одного патча? Пусть начиная с контекста $a$ были
+сделаны две не связанные между собой последовательности патчей
+$p_1p_2\ldots p_n$ и $q_1q_2\ldots q_m$. Как найти такие
+последовательности $p'_1p'_2\ldots p'_n$ и $q'_1q'_2\ldots q'_m$, что
+${\cal E}(p_i) = {\cal E}(p'_i)$, ${\cal E}(q_j) = {\cal E}(q'_j)$, а
+также, $p_1\ldots p_n, q_1\ldots q_m \longleftrightarrow q'_1\ldots
+q'_m, p'_1\ldots p'_n$? 
+
+Будем считать, что объединяемые последовательности $p_1\ldots p_n$ и
+$q_1\ldots q_m$ не имеют общего префикса. Если они имеют, то можно
+поступить следующим образом, проиллюстрированным на
+рисунке~\ref{fig:manymerge-common-prefix}: отрезав общий префикс,
+объединить хвосты, затем приклеить общий префикс в начало результата.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.4\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[context] (a) {$a$}; 
+      \node[context] (b1) [below left=of a] {$b$};
+      \node[context] (b2) [below right=of a] {$b'$};
+      \node[context] (c) [below=of b1] {$c$};
+      \node[context] (d) [below=of b2] {$d$};
+      \node[context] (e) [below right=of c] {$e$};
+      
+      \draw[->] (a) to node[patch]{$c_1\ldots c_k$} (b1);
+      \draw[->] (a) to node[patch]{$c_1\ldots c_k$} (b2);
+      \draw[->] (b1) to node[patch]{$p_{k+1}\ldots p_n$} (c);
+      \draw[->] (b2) to node[patch]{$q_{k+1}\ldots q_m$} (d);
+      \draw[->,dashed] (c) to node[patch]{$?$} (e);
+      \draw[->,dashed] (d) to node[patch]{$?$} (e);
+    \end{tikzpicture}
+  \end{subfigure}
+  \begin{subfigure}{0.4\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[context] (a) {$a$}; 
+      \node[context] (b) [below=of a] {$b$};
+      \node[context] (c) [below left=of b] {$c$};
+      \node[context] (d) [below right=of b] {$d$};
+      \node[context] (e) [below right=of c] {$e$};
+      
+      \draw[->] (a) to node[patch]{$c_1\ldots c_k$} (b);
+      \draw[->] (b) to node[patch]{$p_{k+1}\ldots p_n$} (c);
+      \draw[->] (b) to node[patch]{$q_{k+1}\ldots q_m$} (d);
+      \draw[->,dashed] (c) to node[patch]{$?$} (e);
+      \draw[->,dashed] (d) to node[patch]{$?$} (e);
+    \end{tikzpicture}
+  \end{subfigure}
+  \caption{Избавление от общего префикса}
+  \label{fig:manymerge-common-prefix}
+\end{figure}
+
 
 \section{Выводы по главе \ref{chapter1}}
