@@ -286,7 +286,6 @@ q', p'$, $p = p'$ и $q = q'$. Однако, всё ещё ${\cal E}(p) = {\cal
       \end{tabular}
     }] {$d$};
 
-
     \node[context] (c) [below right=2.5cm of b, label=below:{
       \begin{tabular}{|r|l|}
         \hline
@@ -312,7 +311,82 @@ q', p'$, $p = p'$ и $q = q'$. Однако, всё ещё ${\cal E}(p) = {\cal
 
 Пусть в некоторый момент времени у двух различных пользователей
 репозиторий находился в состоянии $a$, и они решили одновременно
-внести правки в один и тот же файл. 
+внести правки в один и тот же файл. С первого взгляда может
+показаться, что для этого может понадобиться вводить в Darcs
+какой-нибудь новый примитив, но, на самом деле, можно обойтись уже
+имеющейся коммутацией патчей. 
 
+На рисунке~\ref{fig:merge-before} схематически изображена решаемая
+задача: имея два патча с общим началом, построить получить результат
+их последовательного применения. 
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[>=stealth,thick]
+    \node[context] (a) {$a$}; 
+    \node[context] (b) [below left=of a] {$b$};
+    \node[context] (c) [below right=of a] {$c$};
+    
+    \draw[->] (a) to node[patch]{$p$} (b);
+    \draw[->] (a) to node[patch]{$q$} (c);
+  \end{tikzpicture}
+  \caption{Merge двух патчей}
+  \label{fig:merge-before}
+\end{figure}
+
+Посмотрим, что получится, если скоммутировать патчи $p^{-1}$ и $q$. На
+рисунке~\ref{fig:merge} видно, что $p^{-1}, q \longleftrightarrow q',
+(p^{-1})'$. Тогда возьмём, как показано на
+рисунке~\ref{fig:merge-result}, в качестве искомых патчей, $p, q
+\longleftrightarrow q', ((p^{-1})')^{-1}$.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[context] (a) {$a$}; 
+      \node[context] (b) [below left=of a] {$b$};
+      \node[context] (c) [below right=of a] {$c$};
+      
+      \draw[<-] (a) to node[patch]{$p^{-1}$} (b);
+      \draw[->] (a) to node[patch]{$q$} (c);
+    \end{tikzpicture}
+    \caption{До коммутации $p^{-1}$ и $q$}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[context] (a) {$a$}; 
+      \node[context] (b) [below left=of a] {$b$};
+      \node[context] (c) [below right=of a] {$c$};
+      \node[context] (d) [below right=of b] {$d$};
+      
+      \draw[<-] (a) to node[patch]{$p^{-1}$} (b);
+      \draw[->] (a) to node[patch]{$q$} (c);
+      \draw[->] (b) to node[patch]{$q'$} (d);
+      \draw[<-] (c) to node[patch]{$(p^{-1})'$} (d);
+    \end{tikzpicture}
+    \caption{После коммутации $p^{-1}$ и $q$}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[context] (a) {$a$}; 
+      \node[context] (b) [below left=of a] {$b$};
+      \node[context] (c) [below right=of a] {$c$};
+      \node[context] (d) [below right=of b] {$d$};
+      
+      \draw[->] (a) to node[patch]{$p$} (b);
+      \draw[->] (a) to node[patch]{$q$} (c);
+      \draw[->] (b) to node[patch]{$q'$} (d);
+      \draw[->] (c) to node[patch]{$((p^{-1})')^{-1}$} (d);
+    \end{tikzpicture}
+    \caption{Коммутация $p$ и $q$}
+    \label{fig:merge-result}
+  \end{subfigure}
+  \caption{Коммутация $p^{-1}$ и $q$}
+  \label{fig:merge}
+\end{figure}
 
 \section{Выводы по главе \ref{chapter1}}
