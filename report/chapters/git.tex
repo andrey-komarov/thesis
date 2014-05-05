@@ -125,4 +125,113 @@ HEAD используется для того, чтобы Git знал, каки
 текущую изменённую пользователем рабочую директорию. 
 
 Такие определения выглядят довольно запутанно и непонятно. Рассмотрим
-пример. 
+пример.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[gitcommit] (a) {$A$\nodepart{second}};
+      \node[gitbranch] (master) [above=of a] {master};
+
+      \draw[gitbranchconnect] (master) to (a);
+    \end{tikzpicture}
+    \caption{init}
+    \label{fig:git-init}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[gitcommit] (a) {$A$\nodepart{second}};
+      \node[gitcommit] (b) [right=of a] {$B$\nodepart{second}a.txt};
+      \node[gitbranch] (master) [above=of b] {master};
+
+      \draw[<-] (a) to (b);
+      \draw[gitbranchconnect] (master) to (b);
+    \end{tikzpicture}
+    \caption{add a.txt; commit a.txt}
+    \label{fig:git-add-commit}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[gitcommit] (a) {$A$\nodepart{second}};
+      \node[gitcommit] (b) [right=of a] {$B$\nodepart{second}a.txt};
+      \node[gitbranch] (master) [above=of b] {master};
+      \node[gitbranch] (feature) [below=of b] {feature};
+
+      \draw[<-] (a) to (b);
+      \draw[gitbranchconnect] (master) to (b);
+      \draw[gitbranchconnect] (feature) to (b);
+    \end{tikzpicture}
+    \caption{checkout -b feature}
+    \label{fig:git-checkout-feature}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[gitcommit] (a) {$A$\nodepart{second}};
+      \node[gitcommit] (b) [right=of a] {$B$\nodepart{second}a.txt};
+      \node[gitcommit] (c) [below right=of b]
+      {$C$\nodepart{second}a.txt, b.txt};
+      \node[gitbranch] (master) [above=of b] {master};
+      \node[gitbranch] (feature) [below=of c] {feature};
+
+      \draw[<-] (a) to (b);
+      \draw[<-] (b) to (c);
+      \draw[gitbranchconnect] (master) to (b);
+      \draw[gitbranchconnect] (feature) to (c);
+    \end{tikzpicture}
+    \caption{add b.txt; commit b.txt}
+    \label{fig:git-add-commit-b}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[gitcommit] (a) {$A$\nodepart{second}};
+      \node[gitcommit] (b) [right=of a] {$B$\nodepart{second}a.txt};
+      \node[gitcommit] (c) [below right=of b]
+      {$C$\nodepart{second}a.txt, b.txt};
+      \node[gitcommit] (d) [right=of b]
+      {$D$\nodepart{second}a.txt, c.txt};
+      \node[gitbranch] (master) [above=of d] {master};
+      \node[gitbranch] (feature) [below=of c] {feature};
+
+      \draw[<-] (a) to (b);
+      \draw[<-] (b) to (c);
+      \draw[<-] (b) to (d);
+      \draw[gitbranchconnect] (master) to (d);
+      \draw[gitbranchconnect] (feature) to (c);
+    \end{tikzpicture}
+    \caption{checkout master; add c.txt; commit c.txt}
+    \label{fig:git-checkout-master}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[gitcommit] (a) {$A$\nodepart{second}};
+      \node[gitcommit] (b) [right=of a] {$B$\nodepart{second}a.txt};
+      \node[gitcommit] (c) [below right=of b]
+      {$C$\nodepart{second}a.txt, b.txt};
+      \node[gitcommit] (d) [right=of b]
+      {$D$\nodepart{second}a.txt, c.txt};
+      \node[gitcommit] (e) [right=of d]
+      {$E$\nodepart{second}a.txt, b.txt, c.txt};
+      \node[gitbranch] (master) [above=of e] {master};
+      \node[gitbranch] (feature) [below=of c] {feature};
+
+      \draw[<-] (a) to (b);
+      \draw[<-] (b) to (c);
+      \draw[<-] (b) to (d);
+      \draw[<-] (c) to (e);
+      \draw[<-] (d) to (e);
+      \draw[gitbranchconnect] (master) to (e);
+      \draw[gitbranchconnect] (feature) to (c);
+    \end{tikzpicture}
+    \caption{merge feature}
+    \label{fig:git-checkout-master}
+  \end{subfigure}
+  \caption{Пример работы в Git-репозитории}
+  \label{fig:git-workflow}
+\end{figure}

@@ -16,9 +16,13 @@
 \usepackage{epigraph}
 
 \usepackage{tikz}
-\usetikzlibrary{arrows,positioning}
+\usetikzlibrary{arrows,positioning,shapes}
 \tikzset{context/.style={circle, draw=black, minimum size=1cm}}
 \tikzset{patch/.style={fill=white}}
+\tikzset{gitbranch/.style={rectangle, rounded corners, draw=black}}
+\tikzset{gitcommit/.style={rectangle, rounded corners, draw=black,
+    minimum width = 1.5cm, rectangle split, rectangle split parts = 2}}
+\tikzset{gitbranchconnect/.style={->,dashed}}
 
 \theoremstyle{plain}
 \newtheorem{theorem}{Теорема}
