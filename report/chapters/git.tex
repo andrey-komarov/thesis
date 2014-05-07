@@ -315,3 +315,94 @@ HEAD используется для того, чтобы Git знал, каки
 Операции по добавлению файлов в репозиторий и по переводу добавленного
 файла из состояния неподготовленного в состояние подготоленного
 выполняются при помощи команды git add.
+
+\subsubsection{Git commit}
+
+Как уже было продемонстрировано, команда commit сохраняет все
+подготовленные к коммиту файлы в новом коммите, делает предком
+нового коммита тот, на который ранее указывал HEAD и перемещает HEAD и
+указатель текущей ветки на созданный коммит. 
+
+\subsubsection{Git branch, git checkout}
+
+Эти команды нужны для управления ветками. Команда git branch позволяет
+создать ветку-копию текущей, либо удалить любую ветку. Git checkout
+отвечает за переключение между ветками. Её действие можно увидеть на
+рисунке~\ref{fig:git-checkout-feature}.
+
+\subsubsection{Git merge}
+
+Команда для объединения двух или более веток. Пример её работы
+изображён на рисунке~\ref{fig:git-checkout-master}. После объединения
+создаётся новый коммит, предками которого являются коммиты, на которые
+указывали все объединяемые ветки. 
+
+\subsubsection{Git rebase}
+
+Действие команды rebase отдалённо похоже на действие команды merge.
+Вспомним пример, изображённый на рисунке~\ref{fig:git-rebase-before}.
+После применения команды merge получалась история, изображённая на
+рисунке~\ref{fig:git-merge}. Однако, по какой-либо причине хочется
+иметь линейную историю, по которой можно сказать, что коммит был
+раньше или позже другого коммита. Rebase служит именно этой цели. 
+
+Пусть на рисунке~\ref{fig:git-rebase-before} в качестве текущей
+выбрана ветка feature. Тогда после выполнения команды ``git rebase
+master'' история будет выглядеть как на
+рисунке~\ref{fig:git-rebase-after}. Особо стоит обратить внимание, что
+$C \ne C'$. Как видно, был достигнут тот же конечный результат, что и
+при выполнении merge. Отличие в том, что для выполнения merge был
+создан отдельный коммит, а при выполнении rebase \emph{необратимо}
+модифицировались имеющиеся. В этом и есть отличие merge от rebase~---
+при rebase необратимо меняется репозиторий, стираются прошлые коммиты,
+вместо них добавляются новые, похожие. При merge же никаких
+деструктивных изменений репозитория не происходит: добавляется один
+новый коммит и ничего не удаляется.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[gitcommit] (a) {$A$\nodepart{second}};
+      \node[gitcommit] (b) [right=of a] {$B$\nodepart{second}a.txt};
+      \node[gitcommit] (c) [below right=of b]
+      {$C$\nodepart{second}a.txt, b.txt};
+      \node[gitcommit] (d) [right=of b]
+      {$D$\nodepart{second}a.txt, c.txt};
+      \node[gitbranch] (master) [above=of d] {master};
+      \node[gitbranch] (feature) [below=of c] {feature};
+
+      \draw[<-] (a) to (b);
+      \draw[<-] (b) to (c);
+      \draw[<-] (b) to (d);
+      \draw[gitbranchconnect] (master) to (d);
+      \draw[gitbranchconnect] (feature) to (c);
+    \end{tikzpicture}
+    \caption{До rebase}
+    \label{fig:git-rebase-before}
+  \end{subfigure}
+  \begin{subfigure}{0.6\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth,thick]
+      \node[gitcommit] (a) {$A$\nodepart{second}};
+      \node[gitcommit] (b) [right=of a] {$B$\nodepart{second}a.txt};
+      \node[gitcommit] (d) [right=of b]
+      {$D$\nodepart{second}a.txt, c.txt};
+      \node[gitcommit] (c') [right=of d]
+      {$C'$\nodepart{second}a.txt, b.txt, c.txt};
+      \node[gitbranch] (master) [above=of d] {master};
+      \node[gitbranch] (feature) [below=of c'] {feature};
+
+      \draw[<-] (a) to (b);
+      \draw[<-] (b) to (c');
+      \draw[<-] (b) to (d);
+      \draw[gitbranchconnect] (master) to (d);
+      \draw[gitbranchconnect] (feature) to (c');
+    \end{tikzpicture}
+    \caption{После rebase}
+    \label{fig:git-rebase-after}
+  \end{subfigure}
+  \caption{Демонстрация работы git rebase}
+  \label{fig:git-rebase}
+\end{figure}
