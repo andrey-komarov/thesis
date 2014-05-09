@@ -1,2 +1,100 @@
 \section{Camp}
 
+Camp~--- экспериментальная система контроля версий. Является
+теоретическим дальнейшим развитием Darcs и содержит много общей с
+Darcs теории. Дадим её обзорное описание.
+
+Также, как в Darcs, в Camp хранятся \emph{патчи}. Изначально
+репозиторий пустой. Чтобы добавить туда что-нибудь, нужно создать
+патч, превращающий пустой репозиторий во что-то нужное.
+
+\subsection{Неименованные патчи}
+
+\emph{Неименованные патчи} являются основным <<материалом>> для
+создания репозитория. Являют собой, собственно, изменения, которые
+вносятся в рабочую копию. 
+
+Также, как в Darcs, каждый неименованный патч $\underline{p}$ имеет
+патч с обратным эффектом $\underline{p}^{-1}$. Неименованные патчи
+можно применять последовательно: $\underline{p}\underline{q}$ значит,
+что сначала применяется патч $\underline{p}$, а затем патч
+$\underline{q}$.
+
+Над парами патчей, также, вводится частичная функция коммутации: пары
+$\langle\underline{p}, \underline{q}\rangle$ и
+$\langle\underline{q'}, \underline{p'}\rangle$ \emph{коммутируют}
+(записывается как $\langle\underline{p}, \underline{q}\rangle
+\longleftrightarrow \langle\underline{q'}, \underline{p'}\rangle$),
+если применение $\underline{p}$, а затем $\underline{q}$ эквивалентно
+применению сначала $\underline{q'}$, а затем $\underline{p'}$, а
+также, $\underline{p}$ имеет то же действие, что и $\underline{p'}$, а
+$\underline{q}$~--- то же, что $\underline{q'}$.
+
+Коммутация должна обладать следующими свойствами:
+
+\begin{itemize}
+\item Определена для каждой пары $\langle \underline{p}, \underline{q}
+  \rangle$ единственным образом: если $\langle \underline{p},
+  \underline{q} \rangle \longleftrightarrow \langle \underline{q'},
+  \underline{p'}\rangle$ и $\langle \underline{p}, \underline{q}
+  \rangle \longleftrightarrow \langle \underline{q''},
+  \underline{p''}\rangle$, то $\underline{p'} = \underline{p''}$ и
+  $\underline{q'} = \underline{q''}$.
+\item Дважды применённая, должна выдавать начальные данные: если
+  $\langle \underline{p}, \underline{q} \rangle \longleftrightarrow
+  \langle \underline{q'}, \underline{p'}\rangle$, то $\langle
+  \underline{q'}, \underline{p'} \rangle \longleftrightarrow \langle
+  \underline{p}, \underline{q}\rangle$.
+\end{itemize}
+
+\subsection{Именованные патчи}
+
+Введём \emph{имена} патчей~--- нечто, однозначно характеризующее патч.
+Имена могут быть \emph{положительными} или \emph{отрицательными}. При
+создании патч получает положительное имя. После его обращения имя
+меняет знак на противоположный. 
+
+Назовём \emph{патчем} пару из имени и неименованного патча и логичным
+образом расширим введённые для неименованных патчей определения для
+обращения, композиции и коммутации с тем ограничением, что патч не
+коммутирует с патчем с таким же именем или таким же именем с
+противоположным знаком. При коммутации имя будет сохраняться: если
+$\langle p, q \rangle \longleftrightarrow \langle q', p' \rangle$, то
+имя $n(p) = n(p')$, $n(q) = n(q')$.
+
+\subsection{Последовательности патчей}
+
+Обобщим введённые понятия с единичного патча на последовательности
+патчей. Единственную сложность представляет обобщения коммутации.
+Введём коммутацию последовательносей следующим образом.
+
+\begin{itemize}
+\item $\langle \overline{p}, \varepsilon \rangle \longleftrightarrow
+  \langle \overline{p}, \varepsilon \rangle$
+\item $\langle \varepsilon, \overline{p} \rangle \longleftrightarrow
+  \langle \varepsilon, \overline{p} \rangle$
+\item $\langle \overline{p}q, r\overline{s} \longleftrightarrow
+  \langle r''\overline{s''}, \overline{p''}q''
+  \rangle$, если:
+  \begin{itemize}
+  \item $\langle q, r \rangle \longleftrightarrow \langle r', q' \rangle$
+  \item $\langle \overline{p}, r' \rangle \longleftrightarrow \langle
+    r'', \overline{p'} \rangle$
+  \item $\langle q', \overline{s} \rangle \longleftrightarrow \langle
+    \overline{s'}, q'' \rangle$
+  \item $\langle \overline{p'}, \overline{s'} \rangle
+    \longleftrightarrow \langle \overline{s''}, \overline{p''} \rangle$
+  \end{itemize}
+\end{itemize}
+
+\subsection{Merge}
+
+Merge в Camp происходит аналогично merge в Darcs: находится
+наидлиннейший общий префикс двух сливаемых историй, записывается в
+результат, процесс продолжается для двух историй без общего префикса.
+Для них запускается процедура, показанная на рисунках~\ref{fig:merge}.
+
+\subsection{Итд}
+
+Catch-и, конфликторы, контекстнутые патчи и прочие ужасные вещи,
+в которых я пока примерно ничего не понял.
