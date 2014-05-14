@@ -95,10 +95,11 @@ module With-⋀-and-⋙ (A : Set) where
     → patch p₁ x p₁⊏x ≡ patch p₂ x p₂⊏x
 
   -- ещё и транзитивность фиг докажешь
-  ⟷-trans : ∀ {n}{f₁ f₂ f₃ : Form n}
+  {- ⟷-trans : ∀ {n}{f₁ f₂ f₃ : Form n}
     → {p₁ : Patch f₁}{p₂ : Patch f₂}{p₃ : Patch f₃}
     → (p₁ ⟷ p₂) → (p₂ ⟷ p₃) → (p₁ ⟷ p₃)
   ⟷-trans p₁⟷p₂ p₂⟷p₃ x p₁⊏x p₃⊏x = {!!}
+  -}
   
     
   -- Улучшим
@@ -280,9 +281,10 @@ module With-⋀-and-⋙ (A : Set) where
     → (x : A) → (⊥∷ p₁) ⟷ (⊥∷ p₂) → p₁ ⟷ p₂
   strip-⊥⊥ x ⊥∷p₁⟷⊥∷p₂ xs p₁⊏xs p₂⊏xs = vec-strip (⊥∷p₁⟷⊥∷p₂ (x ∷ xs) (⊥⊏ x p₁⊏xs) (⊥⊏ x p₂⊏xs))
   
-  patch-lem-1 : ∀ {n} {f₁ f₂ : Form n} {p₁ : Patch f₁} {p₂ : Patch f₂} {x t₁ t₂ : A}
+  {- patch-lem-1 : ∀ {n} {f₁ f₂ : Form n} {p₁ : Patch f₁} {p₂ : Patch f₂} {x t₁ t₂ : A}
     → (⟨ x ⇒ t₁ ⟩∷ p₁) ⟷ (⟨ x ⇒ t₂ ⟩∷ p₂) → t₁ ≡ t₂
   patch-lem-1 {x = x}{t₁}{t₂} 1⟷2 = {!1⟷2 (x ∷ ?)!}
+  -}
   
   -- c = c' ∧ c'' ⇒ (a ∧ b) ⋙ c ⟷ (a ⋙ c') ∧ (b ⋙ c'')
   {- Плохая формулировка. `c` взято не так, как надо. 

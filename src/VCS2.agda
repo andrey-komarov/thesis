@@ -150,6 +150,7 @@ module SimpleWithFunctions (A : Set) where
   
   {- Но тут ничего не получилось из-за патчей, говорящих, что они 
      поменяют букву, но на самом деле ничего не делают -}
+  {-
   ⟷-strip-⊥⊤ : ∀ {n}{f₁ f₂ : Form n}
     → {p₁ : Patch f₁} → {p₂ : Patch f₂}
     → (from to : A)
@@ -158,8 +159,10 @@ module SimpleWithFunctions (A : Set) where
     p₁⟷p₂ (from ∷ []) (⊥⊏ from []⊏[]) (⊤⊏ from to []⊏[])
   ⟷-strip-⊥⊤ {zero} {.[]} {.[]} {O} {O} .to to p₁⟷p₂ | refl = {!!}
   ⟷-strip-⊥⊤ {succ n} from to p₁⟷p₂ = {!!}
+  -}
 
   {- Не судьба -}
+  {-
   ⟷-isoshape : ∀ {n}{f₁ f₂ : Form n}
     → {p₁ : Patch f₁} → {p₂ : Patch f₂}
     → p₁ ⟷ p₂ → f₁ ≡ f₂
@@ -169,6 +172,7 @@ module SimpleWithFunctions (A : Set) where
   ⟷-isoshape {succ n} {.false ∷ f₁} {.true ∷ f₂} {⊥∷ p₁} {⟨ from ⇒ to ⟩∷ p₂} p₁⟷p₂ = ⊥-elim (⟷-strip-⊥⊤ from to p₁⟷p₂)
   ⟷-isoshape {succ n} {.true ∷ f₁} {.false ∷ f₂} {⟨ from ⇒ to ⟩∷ p₁} {⊥∷ p₂} p₁⟷p₂ = {!!}
   ⟷-isoshape {succ n} {.true ∷ f₁} {.true ∷ f₂} {⟨ from ⇒ to ⟩∷ p₁} {⟨ from₁ ⇒ to₁ ⟩∷ p₂} p₁⟷p₂ = {!!}
+  -}
 
   {- Кстати, как можно формулировать такие утверждения?
      Беда в том, что _≡_ неприменимо к операндам разных типов,

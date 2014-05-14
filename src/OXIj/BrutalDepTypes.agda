@@ -10,7 +10,9 @@
 
 module OXIj.BrutalDepTypes where
 
+open import Agda.Primitive
 
+{-
 module Level where
   -- Universe levels
   postulate Level : Set
@@ -22,12 +24,13 @@ module Level where
   infixl 5 _⊔_
 
   -- Make them work
-  {-# BUILTIN LEVEL     Level #-}
-  {-# BUILTIN LEVELZERO lzero #-}
-  {-# BUILTIN LEVELSUC  lsucc #-}
-  {-# BUILTIN LEVELMAX  _⊔_   #-}
+  -- {-# BUILTIN LEVEL     Level #-}
+  -- {-# BUILTIN LEVELZERO lzero #-}
+  -- {-# BUILTIN LEVELSUC  lsucc #-}
+  -- {-# BUILTIN LEVELMAX  _⊔_   #-}
 
 open Level public
+-}
 
 module Function where
   -- Dependent application
