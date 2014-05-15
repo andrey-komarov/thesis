@@ -313,8 +313,10 @@ module With-⋀-and-⋙ (A : Set) where
 \end{code}
 }
 
-\begin{code}
+\subsection{Свойства \AgdaFunction{\_∧\_}}
 
+\AgdaHide{
+\begin{code}
   ⟶-prepend-⊥⊥ : ∀ {n}{f₁ f₂ : Form n}
     → {p₁ : Patch f₁} → {p₂ : Patch f₂}
     → (p₁ ⟶ p₂) → (⊥∷ p₁ ⟶ ⊥∷ p₂)
@@ -329,18 +331,44 @@ module With-⋀-and-⋙ (A : Set) where
   ⟶-prepend-⊤⊤ {p₁ = p₁}{p₂} .x to p₁⟷p₂ (x ∷ xs) (⊤⊏ .x .to p₁⊏xs) 
     with patch p₁ xs p₁⊏xs | p₁⟷p₂ xs p₁⊏xs 
   ... | .(patch p₂ xs p₂⊏xs) | p₂⊏xs , refl = ⊤⊏ x to p₂⊏xs , refl
+\end{code}
+}
 
-    
-  module ⟷₂-∧-lemmas where
+\AgdaHide{
+\begin{code}
+  module ⟷-∧-lemmas where
+\end{code}
+}
+
+Коммутативность отношения совместности форм. Доказательство по
+индукции по структуре доказательства \AgdaBound{f₁} \AgdaFunction{∥}
+\AgdaBound{f₂}.
+
+\begin{code} 
     ∥-comm : ∀ {n}{f₁ f₂ : Form n} → f₁ ∥ f₂ → f₂ ∥ f₁
+\end{code}
+
+\AgdaHide{
+\begin{code}
     ∥-comm []∥[] = []∥[]
     ∥-comm (⊥∥⊥ f₁∥f₂) = ⊥∥⊥ (∥-comm f₁∥f₂)
     ∥-comm (⊤∥⊥ f₁∥f₂) = ⊥∥⊤ (∥-comm f₁∥f₂)
     ∥-comm (⊥∥⊤ f₁∥f₂) = ⊤∥⊥ (∥-comm f₁∥f₂)
+\end{code}
+}
 
+Если есть три попарно совместных формы, то объединение первых двух
+совместно с третьей. Доказательство по индукции по доказательствам
+попарной совместности.
+
+\begin{code}
     lemma-∥-unite : ∀ {n}{f₁ f₂ f₃ : Form n} 
       → (f₁∥f₂ : f₁ ∥ f₂) → f₂ ∥ f₃ → f₁ ∥ f₃
       → unite f₁∥f₂ ∥ f₃
+\end{code}
+
+\AgdaHide{
+\begin{code}
     lemma-∥-unite []∥[] []∥[] []∥[] = []∥[]
     lemma-∥-unite (⊥∥⊥ f₁∥f₂) (⊥∥⊥ f₂∥f₃) (⊥∥⊥ f₁∥f₃) = 
       ⊥∥⊥ (lemma-∥-unite f₁∥f₂ f₂∥f₃ f₁∥f₃)
@@ -350,11 +378,21 @@ module With-⋀-and-⋙ (A : Set) where
       ⊤∥⊥ (lemma-∥-unite f₁∥f₂ f₂∥f₃ f₁∥f₃)
     lemma-∥-unite (⊥∥⊤ f₁∥f₂) (⊤∥⊥ f₂∥f₃) (⊥∥⊥ f₁∥f₃) = 
       ⊤∥⊥ (lemma-∥-unite f₁∥f₂ f₂∥f₃ f₁∥f₃)
-    
+\end{code}
+}
+
+Коммутативность операции объединения неконфликтующих патчей. 
+Получающиеся при обмене аргументов местами патчи эквивалентны.
+
+\begin{code}    
     ∧-comm : ∀ {n}{f₁ f₂ : Form n}
       → (f₁∥f₂ : f₁ ∥ f₂)
       → (p₁ : Patch f₁) → (p₂ : Patch f₂)
       → ((p₁ ∧ₚ p₂) f₁∥f₂) ⟷ ((p₂ ∧ₚ p₁) (∥-comm f₁∥f₂))
+\end{code}
+
+\AgdaHide{
+\begin{code}
     ∧-comm []∥[] O O = (λ x x₁ → x₁ , refl) , (λ x x₁ → x₁ , refl)
     ∧-comm (⊥∥⊥ f₁∥f₂) (⊥∷ p₁) (⊥∷ p₂) =
       (⟶-prepend-⊥⊥ (fst p)) , (⟶-prepend-⊥⊥ (snd p)) where
@@ -365,7 +403,13 @@ module With-⋀-and-⋙ (A : Set) where
     ∧-comm (⊥∥⊤ f₁∥f₂) (⊥∷ p₁) (⟨ from ⇒ to ⟩∷ p₂) = 
       (⟶-prepend-⊤⊤ from to (fst p)) , (⟶-prepend-⊤⊤ from to (snd p)) where
       p = ∧-comm f₁∥f₂ p₁ p₂
-    
+\end{code}
+}
+
+Транзитивность. Если три патча попарно не конфликтуют, то неважно, в 
+каком порядке их применять. 
+
+\begin{code}
     ∧-trans : ∀ {n}{f₁ f₂ f₃ : Form n}
       → (f₁∥f₂ : f₁ ∥ f₂) → (f₂∥f₃ : f₂ ∥ f₃) → (f₁∥f₃ : f₁ ∥ f₃)
       → (p₁ : Patch f₁) → (p₂ : Patch f₂) → (p₃ : Patch f₃)
@@ -373,6 +417,10 @@ module With-⋀-and-⋙ (A : Set) where
         ⟷ 
         (p₁ ∧ₚ (p₂ ∧ₚ p₃) f₂∥f₃) 
           (∥-comm (lemma-∥-unite f₂∥f₃ (∥-comm f₁∥f₃) (∥-comm f₁∥f₂)))
+\end{code}
+
+\AgdaHide{
+\begin{code}          
     ∧-trans []∥[] []∥[] []∥[] O O O = (λ x x₁ → x₁ , refl) , (λ x x₁ → x₁ , refl)
     ∧-trans (⊥∥⊥ f₁∥f₂) (⊥∥⊥ f₂∥f₃) (⊥∥⊥ f₁∥f₃) (⊥∷ p₁) (⊥∷ p₂) (⊥∷ p₃) = 
       (⟶-prepend-⊥⊥ (fst p)) , (⟶-prepend-⊥⊥ (snd p)) where
@@ -388,3 +436,80 @@ module With-⋀-and-⋙ (A : Set) where
       (⟶-prepend-⊤⊤ from to (fst p)) , (⟶-prepend-⊤⊤ from to (snd p)) where 
       p = ∧-trans f₁∥f₂ f₂∥f₃ f₁∥f₃ p₁ p₂ p₃
 \end{code}
+}
+
+\subsection{Свойства \AgdaFunction{\_⋙\_}}
+
+\AgdaHide{
+\begin{code}
+  module ⟷-⋙-lemmas where
+\end{code}
+}
+    
+ТУТ МОДНАЯ КАРТИНКА, ОПИСЫВАЮЩАЯ ЭТО СВОЙСТВО
+
+\begin{code}
+    ∧-⋙-lem : ∀ {n} {fᵃ fᵇ fᶜ' fᶜ'' : Form n}
+      (c' : Patch fᶜ')(c'' : Patch fᶜ'')
+      (a : Patch fᵃ)(b : Patch fᵇ)
+      (c'∥c'' : fᶜ' ∥ fᶜ'') 
+      (a∥b : fᵃ ∥ fᵇ)
+      (a∧b⋙?c : (a ∧ₚ b) a∥b ⋙? ((c' ∧ₚ c'') c'∥c''))
+      (a⋙?c' : a ⋙? c')
+      (b⋙?c'' : b ⋙? c'')
+      → (((a ∧ₚ b) a∥b) ⋙ₚ ((c' ∧ₚ c'') c'∥c'')) a∧b⋙?c 
+        ⟷ ((a ⋙ₚ c') a⋙?c' ∧ₚ (b ⋙ₚ c'') b⋙?c'') a∥b
+\end{code}
+
+\AgdaHide{
+\begin{code}
+    ∧-⋙-lem O O O O []∥[] []∥[] O⋙?O O⋙?O O⋙?O = (λ x x₁ → x₁ , refl) , (λ x x₁ → x₁ , refl)
+    ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⊥∷ a) (⊥∷ b) (⊥∥⊥ c'∥c'') (⊥∥⊥ a∥b) (⊥⋙?⊥ a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊥⋙?⊥ b⋙c'') = 
+      (⟶-prepend-⊥⊥ (fst p)) , (⟶-prepend-⊥⊥ (snd p)) where
+      p = ∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙c''
+    ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⊥∷ a) (⟨ from ⇒ to ⟩∷ b) (⊥∥⊥ c'∥c'') (⊥∥⊤ a∥b) (⊤⋙?⊥ .from .to a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊤⋙?⊥ .from .to b⋙c'') = 
+      (⟶-prepend-⊤⊤ from to (fst p)) , (⟶-prepend-⊤⊤ from to (snd p)) where
+      p = ∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙c''
+    ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⟨ from ⇒ to ⟩∷ a) (⊥∷ b) (⊥∥⊥ c'∥c'') (⊤∥⊥ a∥b) (⊤⋙?⊥ .from .to a∧b⋙?c) (⊤⋙?⊥ .from .to a⋙?c') (⊥⋙?⊥ b⋙c'') =
+      (⟶-prepend-⊤⊤ from to (fst p)) , (⟶-prepend-⊤⊤ from to (snd p)) where
+      p = ∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙c''
+    ∧-⋙-lem (⊥∷ c') (⟨ from ⇒ to ⟩∷ c'') (⊥∷ a) (⟨ from₁ ⇒ .from ⟩∷ b) (⊥∥⊤ c'∥c'') (⊥∥⊤ a∥b) (⊤⋙?⊤ .from₁ .from .to a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊤⋙?⊤ .from₁ .from .to b⋙c'') = 
+      (⟶-prepend-⊤⊤ from₁ to (fst p)) , ⟶-prepend-⊤⊤ from₁ to (snd p) where
+      p = ∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙c''
+    ∧-⋙-lem (⟨ from ⇒ to ⟩∷ c') (⊥∷ c'') (⟨ from₁ ⇒ .from ⟩∷ a) (⊥∷ b) (⊤∥⊥ c'∥c'') (⊤∥⊥ a∥b) (⊤⋙?⊤ .from₁ .from .to a∧b⋙?c) (⊤⋙?⊤ .from₁ .from .to a⋙?c') (⊥⋙?⊥ b⋙c'') =
+      (⟶-prepend-⊤⊤ from₁ to (fst p)) , ⟶-prepend-⊤⊤ from₁ to (snd p) where
+      p = ∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙c''
+\end{code}
+}
+
+Ассоциативность \AgdaFunction{\_⋙\_}.
+
+\begin{code}
+    ⋙-assoc : ∀ {n}{f₁ f₂ f₃ : Form n}{p₁ : Patch f₁}{p₂ : Patch f₂}{p₃ : Patch f₃}
+      → (p₁⋙?p₂ : p₁ ⋙? p₂)
+      → ([p₁⋙ₚp₂]⋙?p₃ : (p₁ ⋙ₚ p₂) p₁⋙?p₂ ⋙? p₃)
+      → (p₂⋙?p₃ : p₂ ⋙? p₃)
+      → (p₁⋙?[p₂⋙ₚp₃] : p₁ ⋙? (p₂ ⋙ₚ p₃) p₂⋙?p₃)
+      → (((p₁ ⋙ₚ p₂) p₁⋙?p₂) ⋙ₚ p₃) [p₁⋙ₚp₂]⋙?p₃
+        ⟷
+        (p₁ ⋙ₚ (p₂ ⋙ₚ p₃) p₂⋙?p₃) p₁⋙?[p₂⋙ₚp₃]
+\end{code}
+
+\AgdaHide{
+\begin{code}        
+    ⋙-assoc O⋙?O O⋙?O O⋙?O O⋙?O = (λ x x₁ → x₁ , refl) , (λ x x₁ → x₁ , refl)
+    ⋙-assoc (⊥⋙?⊥ p₁⋙?p₂) (⊥⋙?⊥ [p₁⋙p₂]⋙?p₃) (⊥⋙?⊥ p₂⋙?p₃) (⊥⋙?⊥ p₁⋙?[p₂⋙p₃]) = 
+      (⟶-prepend-⊥⊥ (fst p)) , (⟶-prepend-⊥⊥ (snd p)) where
+      p = ⋙-assoc p₁⋙?p₂ [p₁⋙p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙p₃]
+    ⋙-assoc (⊤⋙?⊥ from to p₁⋙?p₂) (⊤⋙?⊥ .from .to [p₁⋙p₂]⋙?p₃) (⊥⋙?⊥ p₂⋙?p₃) (⊤⋙?⊥ .from .to p₁⋙?[p₂⋙p₃]) = 
+      (⟶-prepend-⊤⊤ from to (fst p)) , ⟶-prepend-⊤⊤ from to (snd p) where
+      p = ⋙-assoc p₁⋙?p₂ [p₁⋙p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙p₃]
+    ⋙-assoc (⊤⋙?⊤ from to to₂ p₁⋙?p₂) (⊤⋙?⊥ .from .to₂ [p₁⋙p₂]⋙?p₃) (⊤⋙?⊥ .to .to₂ p₂⋙?p₃) (⊤⋙?⊤ .from .to .to₂ p₁⋙?[p₂⋙p₃]) = 
+      (⟶-prepend-⊤⊤ from to₂ (fst p)) , ⟶-prepend-⊤⊤ from to₂ (snd p) where
+      p = ⋙-assoc p₁⋙?p₂ [p₁⋙p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙p₃]
+    ⋙-assoc (⊤⋙?⊤ from to to₂ p₁⋙?p₂) (⊤⋙?⊤ .from .to₂ to₃ [p₁⋙p₂]⋙?p₃) (⊤⋙?⊤ .to .to₂ .to₃ p₂⋙?p₃) (⊤⋙?⊤ .from .to .to₃ p₁⋙?[p₂⋙p₃]) = 
+      (⟶-prepend-⊤⊤ from to₃ (fst p)) , ⟶-prepend-⊤⊤ from to₃ (snd p) where
+      p = ⋙-assoc p₁⋙?p₂ [p₁⋙p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙p₃]
+\end{code}
+}
+
