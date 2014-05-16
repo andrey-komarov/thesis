@@ -5,13 +5,20 @@
 \usepackage{xcolor}
 \usetheme{Warsaw}
 
+\setbeamertemplate{caption}[numbered]
+\setbeamerfont{page number in head/foot}{size=\huge}
+\setbeamertemplate{footline}[frame number]
+
+
 \usepackage{tikz}
 \usetikzlibrary{shapes.multipart}
 \usetikzlibrary{chains}
 \tikzset{vecpatch/.style={
     draw=black, 
-    minimum width=1.2cm, 
-    minimum height=0.7cm,
+    minimum width=0.5cm, 
+    minimum height=1cm,
+    inner sep=-1cm,
+    outer sep=-1cm,
     anchor=center}
 }
 \tikzset{vecpatch-f/.style={vecpatch}}

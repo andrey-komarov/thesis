@@ -1,30 +1,57 @@
 \newcommand{\vecf}[0]{\node[vecpatch-f] {};}
-\newcommand{\vect}[2]{\node[vecpatch-t] {$#1 \mapsto #2$};}
+\newcommand{\vect}[2]{\node[vecpatch-t]
+{\begin{tabular}{l}$#1$\\$#2$\\\end{tabular}};}
 
 \begin{frame}[fragile]{Вектора, неконфликтующее объединение}
-  \begin{itemize}
-  \item Порядок не важен
-  \end{itemize}
+  \begin{columns}[T]
+    \begin{column}{0.45\textwidth}
+      \begin{figure}
+        \centering
+        \begin{tikzpicture}
+          \matrix [draw=red] (lhs)
+          {\vecf & \vect{a}{b} & \vecf & \vecf       & \vect{z}{b} \\};
+          
+          \node [vecpatch-op, right=0 of lhs] {$\wedge$};
 
-  \begin{figure}
-    \centering
-    \begin{tikzpicture}
-      \matrix [draw=red] (lhs)
-      {\vecf & \vect{a}{b} & \vecf & \vecf       & \vect{z}{b} \\};
-      
-      \node [vecpatch-op, right=of lhs] {$\wedge$};
+          \matrix [draw=red, below=3mm of lhs] (rhs)
+          {\vecf & \vecf       & \vecf & \vect{x}{x} & \vecf \\};
 
-      \matrix [draw=red, below=of lhs] (rhs)
-      {\vecf & \vecf       & \vecf & \vect{x}{x} & \vecf \\};
+          \node [vecpatch-op, left=0 of rhs] {$\wedge$};
+          \node [vecpatch-op, right=0 of rhs] {$=$};
+          
+          \matrix [draw=red, below=3mm of rhs] (res)
+          {\vecf & \vect{a}{b} & \vecf & \vect{x}{x} & \vect{z}{b} \\};
+          
+          \node [vecpatch-op, left=0 of res] {$=$};
+        \end{tikzpicture}
+        \caption{Неконфликтующее объединение}
+      \end{figure}
+    \end{column}
 
-      \node [vecpatch-op, left=of rhs] {$\wedge$};
-      \node [vecpatch-op, right=of rhs] {$=$};
-      
-      \matrix [draw=red, below=of rhs] (res)
-      {\vecf & \vect{a}{b} & \vecf & \vect{x}{x} & \vect{z}{b} \\};
-      
-      \node [vecpatch-op, left=of res] {$=$};
-    \end{tikzpicture}
-  \end{figure}
+    \begin{column}{0.45\textwidth}
+      \begin{figure}
+        \centering
+        \begin{tikzpicture}
+          \matrix [draw=red] (lhs)
+          {\vecf & \vect{a}{b} & \vect{x}{y} & \vecf & \vect{z}{y} \\};
+          
+          \node [vecpatch-op, right=0 of lhs] {$\ggg$};
+
+          \matrix [draw=red, below=3mm of lhs] (rhs)
+          {\vecf & \vect{b}{c} & \vecf       & \vecf & \vect{y}{x} \\};
+
+          \node [vecpatch-op, left=0 of rhs] {$\ggg$};
+          \node [vecpatch-op, right=0 of rhs] {$=$};
+          
+          \matrix [draw=red, below=3mm of rhs] (res)
+          {\vecf & \vect{a}{c} & \vect{x}{y} & \vecf & \vect{z}{x} \\};
+          
+          \node [vecpatch-op, left=0 of res] {$=$};
+        \end{tikzpicture}
+        \caption{Конфликтующее объединение}
+      \end{figure}
+    \end{column}
+  \end{columns}
+
 \end{frame}
 
