@@ -1,4 +1,4 @@
-\documentclass[fullscreen=true, bookmarks=false]{beamer}
+\documentclass[14pt]{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
 \hypersetup{colorlinks=true, urlcolor=blue}
@@ -6,7 +6,7 @@
 \usetheme{Warsaw}
 
 \setbeamertemplate{caption}[numbered]
-\setbeamerfont{page number in head/foot}{size=\huge}
+\setbeamerfont{page number in head/foot}{size=\large}
 \setbeamertemplate{footline}[frame number]
 
 \usepackage{tikz}
@@ -22,7 +22,7 @@
 }
 \tikzset{vecpatch-f/.style={vecpatch}}
 \tikzset{vecpatch-t/.style={vecpatch,fill=yellow}}
-\tikzset{vecpatch-op/.style={font=\Huge}}
+\tikzset{vecpatch-op/.style={font=\large}}
 
 
 \title{Аксиоматизация системы контроля версий в формализме зависимых типов}
@@ -40,6 +40,7 @@
   \end{flushright}
 \end{frame}
 
+\input{src/aim.tex}
 \input{src/vec.tex}
 
 \end{document}
