@@ -1,0 +1,30 @@
+\newcommand{\vecf}[0]{\node[vecpatch-f] {};}
+\newcommand{\vect}[2]{\node[vecpatch-t] {$#1 \mapsto #2$};}
+
+\begin{frame}[fragile]{Вектора, неконфликтующее объединение}
+  \begin{itemize}
+  \item Порядок не важен
+  \end{itemize}
+
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}
+      \matrix [draw=red] (lhs)
+      {\vecf & \vect{a}{b} & \vecf & \vecf       & \vect{z}{b} \\};
+      
+      \node [vecpatch-op, right=of lhs] {$\wedge$};
+
+      \matrix [draw=red, below=of lhs] (rhs)
+      {\vecf & \vecf       & \vecf & \vect{x}{x} & \vecf \\};
+
+      \node [vecpatch-op, left=of rhs] {$\wedge$};
+      \node [vecpatch-op, right=of rhs] {$=$};
+      
+      \matrix [draw=red, below=of rhs] (res)
+      {\vecf & \vect{a}{b} & \vecf & \vect{x}{x} & \vect{z}{b} \\};
+      
+      \node [vecpatch-op, left=of res] {$=$};
+    \end{tikzpicture}
+  \end{figure}
+\end{frame}
+

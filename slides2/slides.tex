@@ -1,0 +1,33 @@
+\documentclass[fullscreen=true, bookmarks=false]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\hypersetup{colorlinks=true, urlcolor=blue}
+\usepackage{xcolor}
+\usetheme{Warsaw}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{chains}
+\tikzset{vecpatch/.style={
+    draw=black, 
+    minimum width=1.2cm, 
+    minimum height=0.7cm,
+    anchor=center}
+}
+\tikzset{vecpatch-f/.style={vecpatch}}
+\tikzset{vecpatch-t/.style={vecpatch,fill=yellow}}
+\tikzset{vecpatch-op/.style={font=\Huge}}
+
+
+\title{Система контроля версий}
+\author{Андрей Комаров}
+\institute{НИУ ИТМО}
+\date{\today}
+
+\begin{document}
+
+\frame[label=title]{\titlepage}
+
+\input{src/vec.tex}
+
+\end{document}
