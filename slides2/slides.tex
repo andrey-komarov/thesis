@@ -20,10 +20,23 @@
     outer sep=-1cm,
     anchor=center}
 }
+\tikzset{vecpatch-tiny/.style={vecpatch, minimum height=0.6cm}}
 \tikzset{vecpatch-f/.style={vecpatch}}
 \tikzset{vecpatch-t/.style={vecpatch,fill=yellow}}
+\tikzset{vecpatch-d/.style={vecpatch-tiny,anchor=base}}
 \tikzset{vecpatch-op/.style={font=\large}}
+\tikzset{vecpatch-form/.style={vecpatch-tiny,fill=blue!40!white}}
 
+\tikzset{treev/.style={draw=black,circle}}
+
+\newcommand{\vecfe}[0]{\node[vecpatch-tiny] {};}
+\newcommand{\vecff}[0]{\node[vecpatch-form] {};}
+\newcommand{\vecf}[0]{\node[vecpatch-f] {};}
+\newcommand{\vecd}[1]
+{\node[vecpatch-d, draw=none] {$#1$}; 
+ \node[vecpatch-d, text opacity=0] {b};}
+\newcommand{\vect}[2]{\node[vecpatch-t]
+{\begin{tabular}{l}$#1$\\$#2$\\\end{tabular}};}
 
 \title{Аксиоматизация системы контроля версий в формализме зависимых типов}
 \author{Андрей Комаров, гр. 4538}
@@ -40,7 +53,9 @@
   \end{flushright}
 \end{frame}
 
-\input{src/aim.tex}
+\input{src/10-aim.tex}
+\input{src/15-repotypes.tex}
+\input{src/20-form.tex}
 \input{src/vec.tex}
 
 \end{document}

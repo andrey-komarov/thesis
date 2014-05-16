@@ -1,0 +1,36 @@
+\begin{frame}[fragile]{Что хранится в репозитории?}
+  Было рассмотрено два варианта:
+
+  \begin{columns}[b]
+    \begin{column}{0.45\textwidth}
+      \begin{figure}
+        \centering
+        \begin{tikzpicture}
+          \matrix [draw=black] 
+          {\vecd{a} & \vecd{b} & \vecd{c} & 
+            \vecd{d} & \vecd{e} & \vecd{f} \\};
+        \end{tikzpicture}
+        \caption{Вектор константной длины}
+      \end{figure}
+    \end{column}
+    
+    \begin{column}{0.45\textwidth}
+      \begin{figure}
+        \centering
+        \begin{tikzpicture}
+          \node[treev] {a}
+            child {node[treev] {b}
+              child {node[treev] {c}
+              }
+              child {node[treev] {d}
+              }
+            }
+            child {node[treev] {e}
+            };
+        \end{tikzpicture}
+        \caption{Двоичное дерево с элементами в вершинах}
+      \end{figure}
+    \end{column}
+  \end{columns}
+
+\end{frame}

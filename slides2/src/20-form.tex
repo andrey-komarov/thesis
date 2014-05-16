@@ -1,0 +1,21 @@
+\begin{frame}[fragile]{\emph{Форма} патча}
+  \begin{itemize}
+  \item Патч~--- преобразование хранимого в репозитории: 
+    \begin{itemize}
+    \item 
+      \begin{tikzpicture}[anchor=center]
+        \matrix [draw=red] 
+        {\vecf & \vect{a}{b} & \vecf & \vecf       & \vect{z}{y} \\};
+      \end{tikzpicture}~--- заменить $a$ на второй позиции на $b$, $z$
+      на пятой~--- на $y$.
+    \end{itemize}
+  \item \emph{Форма патча}~--- что он меняет:
+    \begin{itemize}
+    \item
+      \begin{tikzpicture}
+        \matrix 
+        {\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+      \end{tikzpicture}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
