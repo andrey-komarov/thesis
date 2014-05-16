@@ -9,7 +9,6 @@
 \setbeamerfont{page number in head/foot}{size=\huge}
 \setbeamertemplate{footline}[frame number]
 
-
 \usepackage{tikz}
 \usetikzlibrary{shapes.multipart}
 \usetikzlibrary{chains}
@@ -26,14 +25,20 @@
 \tikzset{vecpatch-op/.style={font=\Huge}}
 
 
-\title{Система контроля версий}
-\author{Андрей Комаров}
+\title{Аксиоматизация системы контроля версий в формализме зависимых типов}
+\author{Андрей Комаров, гр. 4538}
 \institute{НИУ ИТМО}
 \date{\today}
 
 \begin{document}
 
-\frame[label=title]{\titlepage}
+\begin{frame}
+  \maketitle
+
+  \begin{flushright}
+    Научный руководитель: Малаховски Я. М.
+  \end{flushright}
+\end{frame}
 
 \input{src/vec.tex}
 
