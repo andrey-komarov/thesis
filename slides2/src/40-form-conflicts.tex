@@ -1,0 +1,27 @@
+\begin{frame}[fragile]{Совместность форм}
+  \begin{itemize}
+  \item Формы совместны $\Rightarrow$ патчи можно применять
+    \emph{параллельно}
+  \item Совместные формы можно \emph{объединять}
+  \item 
+    \begin{tikzpicture}\matrix 
+      {\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+    \end{tikzpicture} и 
+    \begin{tikzpicture}\matrix 
+      {\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
+    \end{tikzpicture} совместны
+    \begin{itemize}
+    \item Вместе~--- 
+      \begin{tikzpicture}\matrix 
+        {\vecfe & \vecff & \vecff & \vecff & \vecff \\};
+      \end{tikzpicture}
+    \end{itemize}
+  \item 
+    \begin{tikzpicture}\matrix 
+      {\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+    \end{tikzpicture} и 
+    \begin{tikzpicture}\matrix 
+      {\vecfe & \vecfe & \vecff & \vecff & \vecff \\};
+    \end{tikzpicture} несовместны
+  \end{itemize}
+\end{frame}
