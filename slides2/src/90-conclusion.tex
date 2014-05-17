@@ -1,0 +1,18 @@
+\begin{frame}{Обобщение}
+  \begin{itemize}
+  \item Кажется, что это можно обобщить на любой \texttt{Functor}-like
+    дататайп:
+    \begin{itemize}
+    \item параметризация типом хранимого в репозитории
+      \begin{itemize}
+      \item \texttt{Vec n \textcolor{red}{a}}
+      \item \texttt{BinTree \textcolor{red}{a}}
+      \end{itemize}
+    \item \textcolor{blue}{сумма} \textcolor{red}{произведений}
+      \begin{itemize}
+      \item \texttt{data BinTree a\\= \textcolor{red}{Tree (BinTree a)
+            a (BinTree a)} \\\textcolor{blue}{|} Nil}
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
