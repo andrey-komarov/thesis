@@ -1,0 +1,81 @@
+\begin{frame}[fragile]{Патчи для деревьев и их форма}
+  
+  \begin{tikzpicture}
+    \node[treev,font=\small] (from) {$A$};
+    \node[treev,font=\small, right=4mm of from] (to) {$B$};
+    \path[draw, -latex, very thick] (from) -- (to); 
+
+    \node[outer sep=0,fit=(from)(to),draw=black] (patch){};
+    \begin{pgfonlayer}{background}
+      \node [fill=yellow,fit=(from)(to)] {};
+    \end{pgfonlayer}
+  \end{tikzpicture}~--- заменить дерево $A$ на дерево $B$
+
+  \begin{columns}[b]
+    \begin{column}{0.65\textwidth}
+      \begin{figure}
+        \centering
+        \begin{tikzpicture}
+          \node[treev,font=\small] (from) {a}
+          child {node[treev,font=\small,yshift=7mm] {b}
+          }
+          child[missing] {}
+          ;
+          \node[fit=(from)(from-1),inner sep=0,outer sep=0] (whole from) {};
+
+          \node[treev,font=\small, right=4mm of from] (to) {c}
+          child[missing] {}
+          child {node[treev,font=\small,yshift=7mm] {d}     
+          }
+          ;
+          \node[fit=(to)(to-2),inner sep=0,outer sep=0] (whole to){};
+          \path[draw, -latex, very thick] (whole from) -- (whole to); 
+
+          \node[outer sep=0,fit=(whole from)(whole to),draw=black] (patch){};
+          \begin{pgfonlayer}{background}
+            \node [fill=yellow,fit=(whole from)(whole to)] {};
+          \end{pgfonlayer}
+          
+          \node[treev,font=\small,above right=of patch] (tt) {};
+          \path[draw,-latex,very thick] (tt) -- (patch);
+          
+          \node[treev,font=\small,below right=of tt] (tr) {};
+          \path[draw,-latex,very thick] (tt) -- (tr);
+          
+          \node[treev,font=\small,below left=of tr] (from2) {e};
+          \node[right=4mm of from2] (to2) {};
+          \path[draw, -latex, very thick] (from2) -- (to2);
+
+          \node[outer sep=0,fit=(from2)(to2),draw=black] (patch2){};
+          \begin{pgfonlayer}{background}
+            \node [fill=yellow,fit=(from2)(to2)] {};
+          \end{pgfonlayer}
+          
+          \path[draw, -latex, very thick] (tr) -- (patch2);
+          
+          \node[below right=of tr,xshift=-7mm,yshift=2.5mm] (trr) {};
+          \path[draw, -latex, very thick] (tr) -- (trr);
+        \end{tikzpicture}
+        \caption{Патч для дерева}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.35\textwidth}
+      \begin{figure}
+        \centering
+        \begin{tikzpicture}
+          \node[treev] {}
+          child {node[treev,fill=patchform] {}
+          }
+          child {node[treev] {}
+            child {node[treev,fill=patchform] {}
+            }
+            child {node[treev,fill=green] {}
+            }
+          }
+          ;
+        \end{tikzpicture}
+        \caption{Его форма}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}

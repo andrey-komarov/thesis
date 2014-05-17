@@ -9,9 +9,13 @@
 \setbeamerfont{page number in head/foot}{size=\large}
 \setbeamertemplate{footline}[frame number]
 
+\colorlet{patchform}{blue!40}
 \usepackage{tikz}
 \usetikzlibrary{shapes.multipart}
 \usetikzlibrary{chains}
+\usetikzlibrary{fit}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{arrows}
 \tikzset{vecpatch/.style={
     draw=black, 
     minimum width=0.5cm, 
@@ -25,9 +29,9 @@
 \tikzset{vecpatch-t/.style={vecpatch,fill=yellow}}
 \tikzset{vecpatch-d/.style={vecpatch-tiny,anchor=base}}
 \tikzset{vecpatch-op/.style={font=\large}}
-\tikzset{vecpatch-form/.style={vecpatch-tiny,fill=blue!40!white}}
+\tikzset{vecpatch-form/.style={vecpatch-tiny,fill=patchform}}
 
-\tikzset{treev/.style={draw=black,circle}}
+\tikzset{treev/.style={draw=black,circle,outer sep=0,minimum height=8mm}}
 
 \newcommand{\vecfe}[0]{\node[vecpatch-tiny] {};}
 \newcommand{\vecff}[0]{\node[vecpatch-form] {};}
@@ -56,6 +60,7 @@
 \input{src/10-aim.tex}
 \input{src/15-repotypes.tex}
 \input{src/20-form.tex}
+\input{src/trees.tex}
 \input{src/vec.tex}
 
 \end{document}
