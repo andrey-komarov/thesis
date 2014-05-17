@@ -29,7 +29,7 @@
           }
           ;
           \node[fit=(to)(to-2),inner sep=0,outer sep=0] (whole to){};
-          \path[draw, -latex, very thick] (whole from) -- (whole to); 
+          \path[treearr] (whole from) -- (whole to); 
 
           \node[outer sep=0,fit=(whole from)(whole to),draw=black] (patch){};
           \begin{pgfonlayer}{background}
@@ -37,24 +37,24 @@
           \end{pgfonlayer}
           
           \node[treev,font=\small,above right=of patch] (tt) {};
-          \path[draw,-latex,very thick] (tt) -- (patch);
+          \path[treearr] (tt) -- (patch);
           
           \node[treev,font=\small,below right=of tt] (tr) {};
-          \path[draw,-latex,very thick] (tt) -- (tr);
+          \path[treearr] (tt) -- (tr);
           
           \node[treev,font=\small,below left=of tr] (from2) {e};
           \node[right=4mm of from2] (to2) {$\varepsilon$};
-          \path[draw, -latex, very thick] (from2) -- (to2);
+          \path[treearr] (from2) -- (to2);
 
           \node[outer sep=0,fit=(from2)(to2),draw=black] (patch2){};
           \begin{pgfonlayer}{background}
             \node [fill=yellow,fit=(from2)(to2)] {};
           \end{pgfonlayer}
           
-          \path[draw, -latex, very thick] (tr) -- (patch2);
+          \path[treearr] (tr) -- (patch2);
           
           \node[below right=of tr,xshift=-7mm,yshift=2.5mm] (trr) {};
-          \path[draw, -latex, very thick] (tr) -- (trr);
+          \path[treearr] (tr) -- (trr);
         \end{tikzpicture}
         \caption{Патч для дерева}
       \end{figure}
@@ -64,12 +64,12 @@
         \centering
         \begin{tikzpicture}
           \node[treev] {}
-          child {node[treev,fill=patchform] {}
+          child[treearr] {node[treev,fill=patchform] {}
           }
-          child {node[treev] {}
-            child {node[treev,fill=patchform] {}
+          child[treearr] {node[treev] {}
+            child[treearr] {node[treev,fill=patchform] {}
             }
-            child {node[treev,fill=green] {}
+            child[treearr] {node[treev,fill=green] {}
             }
           }
           ;

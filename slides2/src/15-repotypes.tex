@@ -19,13 +19,13 @@
         \centering
         \begin{tikzpicture}
           \node[treev] {a}
-            child {node[treev] {b}
-              child {node[treev] {c}
+            child[treearr] {node[treev] {b}
+              child[treearr] {node[treev] {c}
               }
-              child {node[treev] {d}
+              child[treearr] {node[treev] {d}
               }
             }
-            child {node[treev] {e}
+            child[treearr] {node[treev] {e}
             };
         \end{tikzpicture}
         \caption{Двоичное дерево с элементами в вершинах}
