@@ -2,6 +2,7 @@
   \begin{itemize}
   \item Кажется, что это можно обобщить на любой \texttt{Functor}-like
     дататайп:
+% а мне кажется, что нет, потому что любая монада — функтор, но мы, например, для (State s) врядли чего-то разумное сможем сделать.
     \begin{itemize}
     \item параметризация типом хранимого в репозитории
       \begin{itemize}
@@ -9,6 +10,8 @@
       \item \texttt{BinTree \textcolor{red}{a}}
       \end{itemize}
     \item \textcolor{blue}{сумма} \textcolor{red}{произведений}
+% это в simply-typed случае, конечно, да. потому что это всегда деревья.
+% а с зависимыми парами я не знаю чего делать, например.
       \begin{itemize}
       \item \texttt{data BinTree a\\= \textcolor{red}{Tree (BinTree a)
             a (BinTree a)} \\\textcolor{blue}{|} Nil}
@@ -16,3 +19,4 @@
     \end{itemize}
   \end{itemize}
 \end{frame}
+% в общем я бы вообще этот слайд убрал пока
