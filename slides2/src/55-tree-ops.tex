@@ -10,7 +10,7 @@
         child[treearr] {node[fill=yellow,rectangle,draw=black] {$A \to B$}
         }
       }
-      child[treearr] {node[treev] {}
+      child[treearr] {node[rectangle, minimum height=1cm] {}
       };
       \node[fit=(lhsr)(lhsr-1)(lhsr-1-1)(lhsr-1-2)(lhsr-2)] (lhs) {};
 
@@ -48,7 +48,7 @@
         child[treearr] {node[fill=yellow,rectangle,draw=black,xshift=6mm] {$G \to H$}
         }
       }
-      child[treearr] {node[treev] {}
+      child[treearr] {node[rectangle, minimum height=1cm] {}
       };
       \node[fit=(lhsr)(lhsr-1)(lhsr-1-1)(lhsr-1-2)(lhsr-2)] (lhs) {};
 
@@ -61,7 +61,7 @@
         child[treearr] {node[fill=yellow,rectangle,draw=black,xshift=-2mm] {$H \to I$}
         }
       }
-      child[treearr] {node[treev] {}
+      child[treearr] {node[rectangle, minimum height=1cm] {}
       };
       \node[fit=(rhsr)(rhsr-1)(lhsr-2)] (rhs) {};
 
@@ -74,7 +74,7 @@
         child[treearr] {node[fill=yellow,rectangle,draw=black,xshift=6mm] {$G \to I$}
         }
       }
-      child[treearr] {node[treev] {}
+      child[treearr] {node[rectangle, minimum height=1cm] {}
       };
     \end{tikzpicture}
     %\caption{Конфликтующее объединение}
