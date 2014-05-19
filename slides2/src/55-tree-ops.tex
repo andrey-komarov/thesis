@@ -1,11 +1,82 @@
 \begin{frame}{Деревья, объединение}
-  \begin{itemize}
-  \item Надо ли этот слайд?
-  \item окей, скоро будет
-%надо
-  \item Представьте себе здесь аналогичную прошлому слайду картинку
-    для деревьев
-%ну просто скопипасть сюда два раза Рис.2 с подсвеченными изменениями
-%и напиши, что это дерево путей до изменений с соответствующими изменениями
-  \end{itemize}
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}
+      [level distance=1cm]
+      \node[treev] (lhsr) {}
+      child[treearr] {node[treev] {}
+        child[treearr] {node[rectangle, minimum height=1cm] {}
+        }
+        child[treearr] {node[fill=yellow,rectangle,draw=black] {$A \to B$}
+        }
+      }
+      child[treearr] {node[treev] {}
+      };
+      \node[fit=(lhsr)(lhsr-1)(lhsr-1-1)(lhsr-1-2)(lhsr-2)] (lhs) {};
+
+      \node[right=0 of lhs,font=\Huge] (and) {$\wedge$};
+
+      \node[treev, right=2cm of lhsr] (rhsr) {}
+      child[treearr] {node[rectangle, minimum height=1cm] {}
+      }
+      child[treearr] {node[fill=yellow,rectangle,draw=black] {$C \to D$}
+      };
+      \node[fit=(rhsr)(rhsr-1)(lhsr-2)] (rhs) {};
+
+      \node[right=3.3cm of lhs,font=\Huge] (eq) {$=$};
+
+      \node[treev, right=3.4cm of rhsr] (lhsr) {}
+      child[treearr] {node[treev] {}
+        child[treearr] {node[rectangle, minimum height=1cm] {}
+        }
+        child[treearr] {node[fill=yellow,rectangle,draw=black] {$A \to B$}
+        }
+      }
+      child[treearr] {node[fill=yellow,rectangle,draw=black] {$C \to D$}
+      };
+    \end{tikzpicture}
+    %\caption{Неконфликтующее объединение}
+  \end{figure}
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}
+      [level distance=1cm,outer sep=0]
+      \node[treev] (lhsr) {}
+      child[treearr] {node[treev] {}
+        child[treearr] {node[fill=yellow,rectangle,draw=black] {$E \to F$}
+        }
+        child[treearr] {node[fill=yellow,rectangle,draw=black,xshift=6mm] {$G \to H$}
+        }
+      }
+      child[treearr] {node[treev] {}
+      };
+      \node[fit=(lhsr)(lhsr-1)(lhsr-1-1)(lhsr-1-2)(lhsr-2)] (lhs) {};
+
+      \node[right=-4mm of lhs,font=\huge] (and) {$\ggg$};
+
+      \node[treev, right=3.3cm of lhsr] (rhsr) {}
+      child[treearr] {node[treev] {}
+        child[treearr] {node[rectangle, minimum height=1cm] {}
+        }
+        child[treearr] {node[fill=yellow,rectangle,draw=black,xshift=-2mm] {$H \to I$}
+        }
+      }
+      child[treearr] {node[treev] {}
+      };
+      \node[fit=(rhsr)(rhsr-1)(lhsr-2)] (rhs) {};
+
+      \node[right=3.4cm of lhs,font=\Huge] (eq) {$=$};
+
+      \node[treev, right=6.8cm of lhsr] {}
+      child[treearr] {node[treev] {}
+        child[treearr] {node[fill=yellow,rectangle,draw=black] {$E \to F$}
+        }
+        child[treearr] {node[fill=yellow,rectangle,draw=black,xshift=6mm] {$G \to I$}
+        }
+      }
+      child[treearr] {node[treev] {}
+      };
+    \end{tikzpicture}
+    %\caption{Конфликтующее объединение}
+  \end{figure}
 \end{frame}
