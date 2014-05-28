@@ -58,7 +58,57 @@
   что уже поменял первый.
 \end{definition}
 
-Будем решать поставленную задачу с использованием языка
-программирования Agda. 
+Для определения того, \emph{конфликтуют} ли два патча, введём понятие
+\emph{формы} патча.
 
-СЮДА НАПИСАТЬ ПРО ДЕРЕВЬЯ
+\begin{definition}[Форма патча]
+  \emph{Форма} патча~--- нечто, что характеризует места ревизии, в
+  которые патч вносит изменения. Для каждой системы контроля версий
+  это будет что-то своё. Посмотрев на две формы, можно сказать, будут
+  ли конфликтовать два обладающих ими патча.
+\end{definition}
+
+Будем решать поставленную задачу с использованием языка
+программирования Agda. Было реализовано две системы контроля версий
+для разных видов ревизий~(рисунок \ref{fig:repotypes}): 
+\begin{itemize}
+\item вектора фиксированной длины~(рисунок~\ref{fig:repotypes-vec});
+\item двоичные деревья с элементами в
+  вершинах~(рисунок~\ref{fig:repotypes-tree}).
+\end{itemize}
+
+Для этих систем контроля версий и операций над ними были доказаны
+некоторые свойства.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \matrix [draw=black] 
+      {\vecd{a} & \vecd{b} & \vecd{c} & 
+        \vecd{d} & \vecd{e} & \vecd{f} \\};
+    \end{tikzpicture}
+    \caption{Вектор константной длины}
+    \label{fig:repotypes-vec}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \node[treev] {a}
+      child[treearr] {node[treev] {b}
+        child[treearr] {node[treev] {c}
+        }
+        child[treearr] {node[treev] {d}
+        }
+      }
+      child[treearr] {node[treev] {e}
+      };
+    \end{tikzpicture}
+    \caption{Двоичное дерево с элементами в вершинах}
+    \label{fig:repotypes-tree}
+  \end{subfigure}
+  \caption{Виды ревизий}
+  \label{fig:repotypes}
+\end{figure}
+
