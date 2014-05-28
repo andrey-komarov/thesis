@@ -33,6 +33,44 @@
     minimum width = 1.5cm, rectangle split, rectangle split parts = 2}}
 \tikzset{gitbranchconnect/.style={->,dashed}}
 
+
+\colorlet{patchform}{blue!40}
+\usepackage{tikz}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{chains}
+\usetikzlibrary{fit}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{arrows}
+\tikzset{vecpatch/.style={
+    draw=black, 
+    minimum width=0.5cm, 
+    minimum height=1cm,
+    inner sep=-1cm,
+    outer sep=-1cm,
+    anchor=center}
+}
+\tikzset{vecpatch-tiny/.style={vecpatch, minimum height=0.5cm}}
+\tikzset{vecpatch-f/.style={vecpatch}}
+\tikzset{vecpatch-t/.style={vecpatch,fill=yellow}}
+\tikzset{vecpatch-d/.style={vecpatch-tiny,anchor=base}}
+\tikzset{vecpatch-op/.style={font=\large}}
+\tikzset{vecpatch-form/.style={vecpatch-tiny,fill=patchform}}
+
+\tikzset{treev/.style={draw=black,circle,outer sep=0,minimum
+    height=8mm,very thick}}
+\tikzset{treearr/.style={draw, -latex, very thick}}
+
+\newcommand{\vecfe}[0]{\node[vecpatch-tiny] {};}
+\newcommand{\vecff}[0]{\node[vecpatch-form] {};}
+\newcommand{\vecf}[0]{\node[vecpatch-f] {};}
+\newcommand{\vecd}[1]
+{\node[vecpatch-d, draw=none] {$#1$}; 
+ \node[vecpatch-d, text opacity=0] {b};}
+\newcommand{\vect}[2]{\node[vecpatch-t]
+{\begin{tabular}{l}$#1$\\$#2$\\\end{tabular}};}
+
+
+
 \theoremstyle{plain}
 \newtheorem{theorem}{Теорема}
 
