@@ -36,6 +36,30 @@ module With-⋀-and-⋙ (A : Set) where
 Теперь определим \emph{патч}, индексированный только что опеределённой
 формой так, чтобы он менял только элементы, стоящие на местах, на
 которых в которых в форме стоит \AgdaInductiveConstructor{true}:
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}[anchor=center]
+      \matrix [draw=red]
+      {\vecf & \vect{a}{b} & \vecf & \vecf       & \vect{z}{y} \\};
+    \end{tikzpicture}
+    \caption{Патч}
+    \label{fig:vec-patch-example-patch}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \matrix
+      {\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+    \end{tikzpicture}
+    \caption{Его форма}
+    \label{fig:vec-patch-example-form}
+  \end{subfigure}
+  \caption{Патч для вектора}
+  \label{fig:vec-patch-example}
+\end{figure}
   
 \begin{code}
   data Patch : ∀ {n} → Form n → Set where
@@ -66,6 +90,11 @@ module With-⋀-and-⋙ (A : Set) where
       → Patch f → Patch (true ∷ f)
 \end{code}
 
+На рисунке~\ref{fig:vec-patch-example-patch} изображён патч для
+векторов длины пять, заменяющий $a$ на второй позиции на $b$, $z$ на
+пятой~--- на $y$. На рисунке~\ref{fig:vec-patch-example-form}
+изображена его форма: вторая и пятая позиции меняются.
+
 \subsection{Совместные формы}
 
 Определим для двух форм отношение \emph{совместности}. Две формы
@@ -85,6 +114,22 @@ module With-⋀-and-⋙ (A : Set) where
 Здесь дано индуктивное опеределение совместности форм, которое гласит,
 что пустые формы совместны, а непустые совместны, если первыми
 элементами в них идут не два \AgdaInductiveConstructor{true}.
+
+Например, формы 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} 
+и 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
+\end{tikzpicture} 
+совместны, а 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} и 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecff \\};
+\end{tikzpicture}~--- нет.
     
 \subsection{TODO ??? Вложенность патчей}
 
@@ -202,6 +247,16 @@ module With-⋀-and-⋙ (A : Set) where
 
 Введём функцию, строяющую по двум совместным формам их объединение.
 Эта функция просто будет считать поэлементное <<или>> двух форм.
+Например, 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} \AgdaFunction{∧ₛ}
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
+\end{tikzpicture} \AgdaFunction{≡}
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecff & \vecff & \vecff \\};
+\end{tikzpicture}
 
 \begin{code}
   _∧ₛ_ : ∀ {n} (f₁ f₂ : Form n) → f₁ ∥ f₂ → Form n
@@ -217,7 +272,9 @@ module With-⋀-and-⋙ (A : Set) where
 На основе этой функции определим функцию, которая по двум патчам с
 совместными формами построит их объединение. Патч-объединение будет
 изменять значение на позиции, если хотя бы в одном из объединяемых
-патчей изменение на этой позиции было.
+патчей изменение на этой позиции было. Пример использования
+\AgdaFunction{\_∧ₚ\_} изображён на
+рисунке~\ref{fig:vec-merge-nonconflict}.
 
 \begin{code}
   _∧ₚ_ : ∀ {n} {f₁ f₂ : Form n} (p₁ : Patch f₁) (p₂ : Patch f₂)
@@ -230,12 +287,37 @@ module With-⋀-and-⋙ (A : Set) where
     ⟨ from ⇒ to ⟩∷ (p₁ ∧ₚ p₂) f₁∥f₂
 \end{code}
 
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \matrix [draw=red] (lhs)
+    {\vecf & \vect{a}{b} & \vecf & \vecf       & \vect{z}{b} \\};
+  
+    \node [vecpatch-op, right=0 of lhs] {$\wedge$};
+
+    \matrix [draw=red, below=3mm of lhs] (rhs)
+    {\vecf & \vecf       & \vecf & \vect{x}{x} & \vecf \\};
+
+    \node [vecpatch-op, left=0 of rhs] {$\wedge$};
+    \node [vecpatch-op, right=0 of rhs] {$=$};
+  
+    \matrix [draw=red, below=3mm of rhs] (res)
+    {\vecf & \vect{a}{b} & \vecf & \vect{x}{x} & \vect{z}{b} \\};
+  
+    \node [vecpatch-op, left=0 of res] {$=$};
+  \end{tikzpicture}
+
+  \caption{Неконфликтующее объединение векторов}
+  \label{fig:vec-merge-nonconflict}
+\end{figure}
+
 \subsection{Объединение конфликтующих патчей}
 
 Как уже оговаривалось выше, при конфликтующем объединении патчей
 считается, что второй патч меняет только то, что уже изменил первый.
 Напишем функцию, которая последовательно применяет два патча,
-обладающие таким свойством.
+обладающие таким свойством. Пример использования изображён на 
+рисунке~\ref{fig:vec-merge-conflict}.
 
 \begin{code}
   _⋙ₚ_ : ∀ {n} {f₁ f₂ : Form n} (p₁ : Patch f₁) (p₂ : Patch f₂)
@@ -247,6 +329,29 @@ module With-⋀-and-⋙ (A : Set) where
   _⋙ₚ_ (⟨ a ⇒ .b ⟩∷ p₁) (⟨ b ⇒ c ⟩∷ p₂) (⊤⋙?⊤ .a .b .c p₁-p₂) = 
     ⟨ a ⇒ c ⟩∷ ((p₁ ⋙ₚ p₂) p₁-p₂)
 \end{code}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \matrix [draw=red] (lhs)
+    {\vecf & \vect{a}{b} & \vect{x}{y} & \vecf & \vect{z}{y} \\};
+
+    \node [vecpatch-op, right=0 of lhs] {$\ggg$};
+
+    \matrix [draw=red, below=3mm of lhs] (rhs)
+    {\vecf & \vect{b}{c} & \vecf       & \vecf & \vect{y}{x} \\};
+
+    \node [vecpatch-op, left=0 of rhs] {$\ggg$};
+    \node [vecpatch-op, right=0 of rhs] {$=$};
+          
+    \matrix [draw=red, below=3mm of rhs] (res)
+    {\vecf & \vect{a}{c} & \vect{x}{y} & \vecf & \vect{z}{x} \\};
+          
+    \node [vecpatch-op, left=0 of res] {$=$};
+  \end{tikzpicture}
+  \caption{Конфликтующее объединение векторов}
+  \label{fig:vec-merge-conflict}
+\end{figure}
 
 
 \subsection{Эквивалентность патчей}
@@ -312,6 +417,8 @@ module With-⋀-and-⋙ (A : Set) where
   open ⟷-equiv
 \end{code}
 }
+
+TODO неправильное определение ⟷.
 
 \subsection{Свойства \AgdaFunction{\_∧\_}}
 
@@ -454,11 +561,11 @@ module With-⋀-and-⋙ (A : Set) where
       (a : Patch fᵃ)(b : Patch fᵇ)
       (c'∥c'' : fᶜ' ∥ fᶜ'') 
       (a∥b : fᵃ ∥ fᵇ)
-      (a∧b⋙?c : (a ∧ₚ b) a∥b ⋙? ((c' ∧ₚ c'') c'∥c''))
-      (a⋙?c' : a ⋙? c')
-      (b⋙?c'' : b ⋙? c'')
-      → (((a ∧ₚ b) a∥b) ⋙ₚ ((c' ∧ₚ c'') c'∥c'')) a∧b⋙?c 
-        ⟷ ((a ⋙ₚ c') a⋙?c' ∧ₚ (b ⋙ₚ c'') b⋙?c'') a∥b
+      (a∧b>>>?c : (a ∧ₚ b) a∥b ⋙? ((c' ∧ₚ c'') c'∥c''))
+      (a>>>?c' : a ⋙? c')
+      (b>>>?c'' : b ⋙? c'')
+      → (((a ∧ₚ b) a∥b) ⋙ₚ ((c' ∧ₚ c'') c'∥c'')) a∧b>>>?c 
+        ⟷ ((a ⋙ₚ c') a>>>?c' ∧ₚ (b ⋙ₚ c'') b>>>?c'') a∥b
 \end{code}
 
 \AgdaHide{
@@ -486,13 +593,13 @@ module With-⋀-and-⋙ (A : Set) where
 
 \begin{code}
     ⋙-assoc : ∀ {n}{f₁ f₂ f₃ : Form n}{p₁ : Patch f₁}{p₂ : Patch f₂}{p₃ : Patch f₃}
-      → (p₁⋙?p₂ : p₁ ⋙? p₂)
-      → ([p₁⋙ₚp₂]⋙?p₃ : (p₁ ⋙ₚ p₂) p₁⋙?p₂ ⋙? p₃)
-      → (p₂⋙?p₃ : p₂ ⋙? p₃)
-      → (p₁⋙?[p₂⋙ₚp₃] : p₁ ⋙? (p₂ ⋙ₚ p₃) p₂⋙?p₃)
-      → (((p₁ ⋙ₚ p₂) p₁⋙?p₂) ⋙ₚ p₃) [p₁⋙ₚp₂]⋙?p₃
+      → (p₁>>?p₂ : p₁ ⋙? p₂)
+      → ([p₁>>ₚp₂]>>?p₃ : (p₁ ⋙ₚ p₂) p₁>>?p₂ ⋙? p₃)
+      → (p₂>>?p₃ : p₂ ⋙? p₃)
+      → (p₁>>?[p₂>>ₚp₃] : p₁ ⋙? (p₂ ⋙ₚ p₃) p₂>>?p₃)
+      → (((p₁ ⋙ₚ p₂) p₁>>?p₂) ⋙ₚ p₃) [p₁>>ₚp₂]>>?p₃
         ⟷
-        (p₁ ⋙ₚ (p₂ ⋙ₚ p₃) p₂⋙?p₃) p₁⋙?[p₂⋙ₚp₃]
+        (p₁ ⋙ₚ (p₂ ⋙ₚ p₃) p₂>>?p₃) p₁>>?[p₂>>ₚp₃]
 \end{code}
 
 \AgdaHide{

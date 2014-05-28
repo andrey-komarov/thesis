@@ -49,6 +49,30 @@
 Теперь определим \emph{патч}, индексированный только что опеределённой
 формой так, чтобы он менял только элементы, стоящие на местах, на
 которых в которых в форме стоит \AgdaInductiveConstructor{true}:
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}[anchor=center]
+      \matrix [draw=red]
+      {\vecf & \vect{a}{b} & \vecf & \vecf       & \vect{z}{y} \\};
+    \end{tikzpicture}
+    \caption{Патч}
+    \label{fig:vec-patch-example-patch}
+  \end{subfigure}
+  \begin{subfigure}{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \matrix
+      {\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+    \end{tikzpicture}
+    \caption{Его форма}
+    \label{fig:vec-patch-example-form}
+  \end{subfigure}
+  \caption{Патч для вектора}
+  \label{fig:vec-patch-example}
+\end{figure}
   
 \begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
@@ -87,6 +111,11 @@
 \>[6]\AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaBound{f} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f}\AgdaSymbol{)}\<%
 \end{code}
 
+На рисунке~\ref{fig:vec-patch-example-patch} изображён патч для
+векторов длины пять, заменяющий $a$ на второй позиции на $b$, $z$ на
+пятой~--- на $y$. На рисунке~\ref{fig:vec-patch-example-form}
+изображена его форма: вторая и пятая позиции меняются.
+
 \subsection{Совместные формы}
 
 Определим для двух форм отношение \emph{совместности}. Две формы
@@ -115,6 +144,22 @@
 Здесь дано индуктивное опеределение совместности форм, которое гласит,
 что пустые формы совместны, а непустые совместны, если первыми
 элементами в них идут не два \AgdaInductiveConstructor{true}.
+
+Например, формы 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} 
+и 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
+\end{tikzpicture} 
+совместны, а 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} и 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecff \\};
+\end{tikzpicture}~--- нет.
     
 \subsection{TODO ??? Вложенность патчей}
 
@@ -272,6 +317,16 @@
 
 Введём функцию, строяющую по двум совместным формам их объединение.
 Эта функция просто будет считать поэлементное <<или>> двух форм.
+Например, 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} \AgdaFunction{∧ₛ}
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
+\end{tikzpicture} \AgdaFunction{≡}
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecff & \vecff & \vecff \\};
+\end{tikzpicture}
 
 \begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
@@ -301,7 +356,9 @@
 На основе этой функции определим функцию, которая по двум патчам с
 совместными формами построит их объединение. Патч-объединение будет
 изменять значение на позиции, если хотя бы в одном из объединяемых
-патчей изменение на этой позиции было.
+патчей изменение на этой позиции было. Пример использования
+\AgdaFunction{\_∧ₚ\_} изображён на
+рисунке~\ref{fig:vec-merge-nonconflict}.
 
 \begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
@@ -332,12 +389,37 @@
 \>[4]\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{∧ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{f₁∥f₂}\<%
 \end{code}
 
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \matrix [draw=red] (lhs)
+    {\vecf & \vect{a}{b} & \vecf & \vecf       & \vect{z}{b} \\};
+  
+    \node [vecpatch-op, right=0 of lhs] {$\wedge$};
+
+    \matrix [draw=red, below=3mm of lhs] (rhs)
+    {\vecf & \vecf       & \vecf & \vect{x}{x} & \vecf \\};
+
+    \node [vecpatch-op, left=0 of rhs] {$\wedge$};
+    \node [vecpatch-op, right=0 of rhs] {$=$};
+  
+    \matrix [draw=red, below=3mm of rhs] (res)
+    {\vecf & \vect{a}{b} & \vecf & \vect{x}{x} & \vect{z}{b} \\};
+  
+    \node [vecpatch-op, left=0 of res] {$=$};
+  \end{tikzpicture}
+
+  \caption{Неконфликтующее объединение векторов}
+  \label{fig:vec-merge-nonconflict}
+\end{figure}
+
 \subsection{Объединение конфликтующих патчей}
 
 Как уже оговаривалось выше, при конфликтующем объединении патчей
 считается, что второй патч меняет только то, что уже изменил первый.
 Напишем функцию, которая последовательно применяет два патча,
-обладающие таким свойством.
+обладающие таким свойством. Пример использования изображён на 
+рисунке~\ref{fig:vec-merge-conflict}.
 
 \begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
@@ -366,6 +448,29 @@
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{c} \AgdaInductiveConstructor{⟩∷} \AgdaSymbol{((}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁-p₂}\AgdaSymbol{)}\<%
 \end{code}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \matrix [draw=red] (lhs)
+    {\vecf & \vect{a}{b} & \vect{x}{y} & \vecf & \vect{z}{y} \\};
+
+    \node [vecpatch-op, right=0 of lhs] {$\ggg$};
+
+    \matrix [draw=red, below=3mm of lhs] (rhs)
+    {\vecf & \vect{b}{c} & \vecf       & \vecf & \vect{y}{x} \\};
+
+    \node [vecpatch-op, left=0 of rhs] {$\ggg$};
+    \node [vecpatch-op, right=0 of rhs] {$=$};
+          
+    \matrix [draw=red, below=3mm of rhs] (res)
+    {\vecf & \vect{a}{c} & \vect{x}{y} & \vecf & \vect{z}{x} \\};
+          
+    \node [vecpatch-op, left=0 of res] {$=$};
+  \end{tikzpicture}
+  \caption{Конфликтующее объединение векторов}
+  \label{fig:vec-merge-conflict}
+\end{figure}
 
 
 \subsection{Эквивалентность патчей}
@@ -494,6 +599,8 @@
 \>[2]\AgdaKeyword{open} \AgdaModule{⟷-equiv}\<%
 \end{code}
 }
+
+TODO неправильное определение ⟷.
 
 \subsection{Свойства \AgdaFunction{\_∧\_}}
 
@@ -790,20 +897,20 @@
 \>[6]\AgdaSymbol{(}\AgdaBound{a∥b} \AgdaSymbol{:} \AgdaBound{fᵃ} \AgdaDatatype{∥} \AgdaBound{fᵇ}\AgdaSymbol{)}\<%
 \\
 \>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{(}\AgdaBound{a∧b⋙?c} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{a} \AgdaFunction{∧ₚ} \AgdaBound{b}\AgdaSymbol{)} \AgdaBound{a∥b} \AgdaDatatype{⋙?} \AgdaSymbol{((}\AgdaBound{c'} \AgdaFunction{∧ₚ} \AgdaBound{c''}\AgdaSymbol{)} \AgdaBound{c'∥c''}\AgdaSymbol{))}\<%
+\>[6]\AgdaSymbol{(}\AgdaBound{a∧b>>>?c} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{a} \AgdaFunction{∧ₚ} \AgdaBound{b}\AgdaSymbol{)} \AgdaBound{a∥b} \AgdaDatatype{⋙?} \AgdaSymbol{((}\AgdaBound{c'} \AgdaFunction{∧ₚ} \AgdaBound{c''}\AgdaSymbol{)} \AgdaBound{c'∥c''}\AgdaSymbol{))}\<%
 \\
 \>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{(}\AgdaBound{a⋙?c'} \AgdaSymbol{:} \AgdaBound{a} \AgdaDatatype{⋙?} \AgdaBound{c'}\AgdaSymbol{)}\<%
+\>[6]\AgdaSymbol{(}\AgdaBound{a>>>?c'} \AgdaSymbol{:} \AgdaBound{a} \AgdaDatatype{⋙?} \AgdaBound{c'}\AgdaSymbol{)}\<%
 \\
 \>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{(}\AgdaBound{b⋙?c''} \AgdaSymbol{:} \AgdaBound{b} \AgdaDatatype{⋙?} \AgdaBound{c''}\AgdaSymbol{)}\<%
+\>[6]\AgdaSymbol{(}\AgdaBound{b>>>?c''} \AgdaSymbol{:} \AgdaBound{b} \AgdaDatatype{⋙?} \AgdaBound{c''}\AgdaSymbol{)}\<%
 \\
 \>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(((}\AgdaBound{a} \AgdaFunction{∧ₚ} \AgdaBound{b}\AgdaSymbol{)} \AgdaBound{a∥b}\AgdaSymbol{)} \AgdaFunction{⋙ₚ} \AgdaSymbol{((}\AgdaBound{c'} \AgdaFunction{∧ₚ} \AgdaBound{c''}\AgdaSymbol{)} \AgdaBound{c'∥c''}\AgdaSymbol{))} \AgdaBound{a∧b⋙?c} \<[56]%
-\>[56]\<%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(((}\AgdaBound{a} \AgdaFunction{∧ₚ} \AgdaBound{b}\AgdaSymbol{)} \AgdaBound{a∥b}\AgdaSymbol{)} \AgdaFunction{⋙ₚ} \AgdaSymbol{((}\AgdaBound{c'} \AgdaFunction{∧ₚ} \AgdaBound{c''}\AgdaSymbol{)} \AgdaBound{c'∥c''}\AgdaSymbol{))} \AgdaBound{a∧b>>>?c} \<[58]%
+\>[58]\<%
 \\
 \>[6]\AgdaIndent{8}{}\<[8]%
-\>[8]\AgdaFunction{⟷} \AgdaSymbol{((}\AgdaBound{a} \AgdaFunction{⋙ₚ} \AgdaBound{c'}\AgdaSymbol{)} \AgdaBound{a⋙?c'} \AgdaFunction{∧ₚ} \AgdaSymbol{(}\AgdaBound{b} \AgdaFunction{⋙ₚ} \AgdaBound{c''}\AgdaSymbol{)} \AgdaBound{b⋙?c''}\AgdaSymbol{)} \AgdaBound{a∥b}\<%
+\>[8]\AgdaFunction{⟷} \AgdaSymbol{((}\AgdaBound{a} \AgdaFunction{⋙ₚ} \AgdaBound{c'}\AgdaSymbol{)} \AgdaBound{a>>>?c'} \AgdaFunction{∧ₚ} \AgdaSymbol{(}\AgdaBound{b} \AgdaFunction{⋙ₚ} \AgdaBound{c''}\AgdaSymbol{)} \AgdaBound{b>>>?c''}\AgdaSymbol{)} \AgdaBound{a∥b}\<%
 \end{code}
 
 \AgdaHide{
@@ -868,25 +975,25 @@
 \>[4]\AgdaFunction{⋙-assoc} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaBound{f₃} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{\}\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{\}\{}\AgdaBound{p₃} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₃}\AgdaSymbol{\}}\<%
 \\
 \>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁⋙?p₂} \AgdaSymbol{:} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)}\<%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁>>?p₂} \AgdaSymbol{:} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)}\<%
 \\
 \>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{[p₁⋙ₚp₂]⋙?p₃} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁⋙?p₂} \AgdaDatatype{⋙?} \AgdaBound{p₃}\AgdaSymbol{)}\<%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{[p₁>>ₚp₂]>>?p₃} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁>>?p₂} \AgdaDatatype{⋙?} \AgdaBound{p₃}\AgdaSymbol{)}\<%
 \\
 \>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₂⋙?p₃} \AgdaSymbol{:} \AgdaBound{p₂} \AgdaDatatype{⋙?} \AgdaBound{p₃}\AgdaSymbol{)}\<%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₂>>?p₃} \AgdaSymbol{:} \AgdaBound{p₂} \AgdaDatatype{⋙?} \AgdaBound{p₃}\AgdaSymbol{)}\<%
 \\
 \>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁⋙?[p₂⋙ₚp₃]} \AgdaSymbol{:} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaFunction{⋙ₚ} \AgdaBound{p₃}\AgdaSymbol{)} \AgdaBound{p₂⋙?p₃}\AgdaSymbol{)}\<%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁>>?[p₂>>ₚp₃]} \AgdaSymbol{:} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaFunction{⋙ₚ} \AgdaBound{p₃}\AgdaSymbol{)} \AgdaBound{p₂>>?p₃}\AgdaSymbol{)}\<%
 \\
 \>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(((}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁⋙?p₂}\AgdaSymbol{)} \AgdaFunction{⋙ₚ} \AgdaBound{p₃}\AgdaSymbol{)} \AgdaBound{[p₁⋙ₚp₂]⋙?p₃}\<%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(((}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁>>?p₂}\AgdaSymbol{)} \AgdaFunction{⋙ₚ} \AgdaBound{p₃}\AgdaSymbol{)} \AgdaBound{[p₁>>ₚp₂]>>?p₃}\<%
 \\
 \>[6]\AgdaIndent{8}{}\<[8]%
 \>[8]\AgdaFunction{⟷}\<%
 \\
 \>[6]\AgdaIndent{8}{}\<[8]%
-\>[8]\AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaFunction{⋙ₚ} \AgdaBound{p₃}\AgdaSymbol{)} \AgdaBound{p₂⋙?p₃}\AgdaSymbol{)} \AgdaBound{p₁⋙?[p₂⋙ₚp₃]}\<%
+\>[8]\AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaFunction{⋙ₚ} \AgdaBound{p₃}\AgdaSymbol{)} \AgdaBound{p₂>>?p₃}\AgdaSymbol{)} \AgdaBound{p₁>>?[p₂>>ₚp₃]}\<%
 \end{code}
 
 \AgdaHide{
