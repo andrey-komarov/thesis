@@ -1,3 +1,6 @@
+\section{Деревья}
+
+\AgdaHide{
 \begin{code}%
 \>\AgdaKeyword{module} \AgdaModule{TreeToReport} \AgdaKeyword{where}\<%
 \\
@@ -5,18 +8,25 @@
 \\
 \>\AgdaKeyword{open} \AgdaKeyword{import} \AgdaModule{OXIj.BrutalDepTypes}\<%
 \\
-\>\<%
-\end{code}
-
-\begin{code}%
+%
+\\
 \>\AgdaKeyword{open} \AgdaModule{≡-Prop}\<%
 \\
 %
 \\
 \>\AgdaKeyword{postulate} \AgdaPostulate{A} \AgdaSymbol{:} \AgdaPrimitiveType{Set}\<%
 \\
-%
-\\
+\>\<%
+\end{code}
+}
+
+В этой части будет рассмотрен второй вид ревизии~--- двоичные
+деревья~(рисунок~\ref{fig:repotypes-tree}).
+
+Дадим классическое определение двоичного дерева: дерево это либо лист,
+который хранит какое-то значение, либо левое и правое поддеревья.
+
+\begin{code}%
 \>\AgdaKeyword{data} \AgdaDatatype{Tree} \AgdaSymbol{:} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
@@ -24,92 +34,278 @@
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaInductiveConstructor{Branch} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{left} \AgdaBound{right} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Tree}\<%
+\end{code}
+  
+\subsection{Форма}
+
+Возьмём в качестве \emph{формы} патчей двоичное дерево, в листьях
+которого стоит либо метка \AgdaInductiveConstructor{Take}, означающая,
+что эта вершина вместе со всем её поддеревом будет заменена патчем,
+либо метка \AgdaInductiveConstructor{Skip}, означающая, что патч будет
+игнорировать эту вершину и никак на неё не повлияет.
+
+\begin{code}%
+\>\AgdaKeyword{data} \AgdaDatatype{Form} \AgdaSymbol{:} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\<%
-\\
-\>\AgdaKeyword{data} \AgdaDatatype{Shape} \AgdaSymbol{:} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
+\>[2]\AgdaInductiveConstructor{Take} \AgdaSymbol{:} \AgdaDatatype{Form}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaInductiveConstructor{Take} \AgdaInductiveConstructor{Skip} \AgdaSymbol{:} \AgdaDatatype{Shape}\<%
+\>[2]\AgdaInductiveConstructor{Skip} \AgdaSymbol{:} \AgdaDatatype{Form}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaInductiveConstructor{Branch} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{left} \AgdaBound{right} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Shape}\<%
-\\
-%
-\\
-\>\AgdaKeyword{data} \AgdaDatatype{\_∥\_} \AgdaSymbol{:} \AgdaDatatype{Shape} \AgdaSymbol{→} \AgdaDatatype{Shape} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
-\\
+\>[2]\AgdaInductiveConstructor{Branch} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{left} \AgdaBound{right} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Form}\<%
+\end{code}
+
+Естесственным образом вводится опеределение совместности таких форм.
+Формы совместны, если:
+
+\begin{code}%
+\>\AgdaKeyword{data} \AgdaDatatype{\_∥\_} \AgdaSymbol{:} \AgdaDatatype{Form} \AgdaSymbol{→} \AgdaDatatype{Form} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
+\end{code}
+
+В корне первой стоит метка \AgdaInductiveConstructor{Skip}
+
+\begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaInductiveConstructor{∅∥✴} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaInductiveConstructor{Skip} \AgdaDatatype{∥} \AgdaBound{s}\<%
-\\
+\>[2]\AgdaInductiveConstructor{∅∥✴} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaInductiveConstructor{Skip} \AgdaDatatype{∥} \AgdaBound{s}\<%
+\end{code}
+
+Либо, в корне второй стоит метка \AgdaInductiveConstructor{Skip}
+
+\begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaInductiveConstructor{✴∥∅} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{s} \AgdaDatatype{∥} \AgdaInductiveConstructor{Skip}\<%
-\\
+\>[2]\AgdaInductiveConstructor{✴∥∅} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{s} \AgdaDatatype{∥} \AgdaInductiveConstructor{Skip}\<%
+\end{code}
+
+Либо, рассматриваемые формы не являются листьями и их соответствующие
+поддеревья совместны
+
+\begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaInductiveConstructor{Branch-∥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{L1} \AgdaBound{R1} \AgdaBound{L2} \AgdaBound{R2} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{L1} \AgdaDatatype{∥} \AgdaBound{L2} \AgdaSymbol{→} \AgdaBound{R1} \AgdaDatatype{∥} \AgdaBound{R2} \<[57]%
-\>[57]\<%
+\>[2]\AgdaInductiveConstructor{Branch-∥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{L1} \AgdaBound{R1} \AgdaBound{L2} \AgdaBound{R2} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{L1} \AgdaDatatype{∥} \AgdaBound{L2} \AgdaSymbol{→} \AgdaBound{R1} \AgdaDatatype{∥} \AgdaBound{R2} \<[56]%
+\>[56]\<%
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaSymbol{→} \AgdaInductiveConstructor{Branch} \AgdaBound{L1} \AgdaBound{R1} \AgdaDatatype{∥} \AgdaInductiveConstructor{Branch} \AgdaBound{L2} \AgdaBound{R2}\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\<%
-\\
-\>\AgdaKeyword{data} \AgdaDatatype{Patch} \AgdaSymbol{:} \AgdaDatatype{Shape} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
-\\
+\end{code}
+    
+\subsection{Патч}
+
+Определим патч аналогично тому, как это делалось в случае с векторами.
+Патч может:
+
+\begin{code}%
+\>\AgdaKeyword{data} \AgdaDatatype{Patch} \AgdaSymbol{:} \AgdaDatatype{Form} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
+\end{code}
+
+Ничего не менять
+
+\begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaInductiveConstructor{I} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaInductiveConstructor{Skip}\<%
-\\
+\end{code}
+
+Либо, заменить какое-то поддерево на другое поддерево
+
+\begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaInductiveConstructor{⟨\_⇒\_⟩} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{from} \AgdaBound{to} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaInductiveConstructor{Take}\<%
-\\
+\end{code}
+
+Либо, что-то сделать в поддеревьях
+
+\begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaInductiveConstructor{⟨\_∧\_⟩} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{sl} \AgdaBound{sr} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{left} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{sl}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{right} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{sr}\AgdaSymbol{)}\<%
+\>[2]\AgdaInductiveConstructor{⟨\_∧\_⟩} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{sl} \AgdaBound{sr} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{left} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{sl}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{right} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{sr}\AgdaSymbol{)}\<%
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch} \AgdaBound{sl} \AgdaBound{sr}\AgdaSymbol{)}\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\<%
-\\
-\>\AgdaKeyword{data} \AgdaDatatype{\_⊏\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaBound{s} \AgdaSymbol{→} \AgdaDatatype{Tree} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
-\\
+\end{code}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[b]{0.65\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \node[treev,font=\small] (from) {a}
+      child {node[treev,font=\small,yshift=7mm] {b}
+      }
+      child[missing] {}
+      ;
+      \node[fit=(from)(from-1),inner sep=0,outer sep=0] (whole from) {};
+
+      \node[treev,font=\small, right=4mm of from] (to) {c}
+      child[missing] {}
+      child {node[treev,font=\small,yshift=7mm] {d}     
+      }
+      ;
+      \node[fit=(to)(to-2),inner sep=0,outer sep=0] (whole to){};
+      \path[treearr] (whole from) -- (whole to); 
+
+      \node[outer sep=0,fit=(whole from)(whole to),draw=black] (patch){};
+      \begin{pgfonlayer}{background}
+        \node [fill=yellow,fit=(whole from)(whole to)] {};
+      \end{pgfonlayer}
+      
+      \node[treev,font=\small,above right=of patch] (tt) {};
+      \path[treearr] (tt) -- (patch);
+      
+      \node[treev,font=\small,below right=of tt] (tr) {};
+      \path[treearr] (tt) -- (tr);
+      
+      \node[treev,font=\small,below left=of tr] (from2) {e};
+      \node[right=4mm of from2] (to2) {$\varepsilon$};
+      \path[treearr] (from2) -- (to2);
+
+      \node[outer sep=0,fit=(from2)(to2),draw=black] (patch2){};
+      \begin{pgfonlayer}{background}
+        \node [fill=yellow,fit=(from2)(to2)] {};
+      \end{pgfonlayer}
+      
+      \path[treearr] (tr) -- (patch2);
+      
+      \node[below right=of tr,xshift=-7mm,yshift=2.5mm] (trr) {};
+      \path[treearr] (tr) -- (trr);
+    \end{tikzpicture}
+    \caption{Патч для дерева}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \node[treev] {}
+      child[treearr] {node[treev,fill=patchform] {}
+      }
+      child[treearr] {node[treev] {}
+        child[treearr] {node[treev,fill=patchform] {}
+        }
+        child[treearr] {node[treev,fill=green] {}
+        }
+      }
+      ;
+    \end{tikzpicture}
+    \caption{Его форма}
+  \end{subfigure}
+  \caption{Пример патча для дерева}
+  \label{fig:tree-patch-example}
+\end{figure}
+
+Пример патча и его формы можно видеть на
+рисунке~\ref{fig:tree-patch-example}.
+    
+Основное отличие от патча над векторами заключается в том, что здесь
+может меняться размер структуры: в векторе один символ всегда
+заменялся на один символ. Здесь же поддерево произвольного размера
+заменяется также на поддерево произвольного размера.
+
+Когда заданный патч может быть применён к заданному дереву?
+
+\begin{code}%
+\>\AgdaKeyword{data} \AgdaDatatype{\_⊏\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaBound{s} \AgdaSymbol{→} \AgdaDatatype{Tree} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
+\end{code}
+
+Пустой патч можно применить всегда.
+
+\begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaInductiveConstructor{⊏-I} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{t} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaInductiveConstructor{I} \AgdaDatatype{⊏} \AgdaBound{t}\<%
-\\
+\end{code}
+
+Патч, меняющий дерево на другое, можно применить только к заменяемому
+дереву.
+
+\begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaInductiveConstructor{⊏-⇒} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{from} \AgdaBound{to} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩} \AgdaDatatype{⊏} \AgdaBound{from}\<%
-\\
+\end{code}
+
+Если патчи применимы к поддеревьям, то из них можно собрать патч,
+применимый к целому дереву.
+
+\begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaInductiveConstructor{⊏-∧} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{sl} \AgdaBound{sr} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{pl} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{sl}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{pr} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{sr}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{tl} \AgdaBound{tr} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{\}}\<%
+\>[2]\AgdaInductiveConstructor{⊏-∧} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{sl} \AgdaBound{sr} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{pl} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{sl}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{pr} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{sr}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{tl} \AgdaBound{tr} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{\}}\<%
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaSymbol{→} \AgdaBound{pl} \AgdaDatatype{⊏} \AgdaBound{tl} \AgdaSymbol{→} \AgdaBound{pr} \AgdaDatatype{⊏} \AgdaBound{tr} \AgdaSymbol{→} \AgdaInductiveConstructor{⟨} \AgdaBound{pl} \AgdaInductiveConstructor{∧} \AgdaBound{pr} \AgdaInductiveConstructor{⟩} \AgdaDatatype{⊏} \AgdaInductiveConstructor{Branch} \AgdaBound{tl} \AgdaBound{tr}\<%
-\\
-%
-\\
-\>\AgdaFunction{∥-test} \AgdaSymbol{:} \AgdaInductiveConstructor{Branch} \AgdaInductiveConstructor{Take} \AgdaInductiveConstructor{Skip} \AgdaDatatype{∥} \AgdaInductiveConstructor{Branch} \AgdaInductiveConstructor{Skip} \AgdaInductiveConstructor{Take}\<%
-\\
-\>\AgdaFunction{∥-test} \AgdaSymbol{=} \AgdaInductiveConstructor{Branch-∥} \AgdaSymbol{(}\AgdaInductiveConstructor{✴∥∅} \AgdaInductiveConstructor{Take}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{∅∥✴} \AgdaInductiveConstructor{Take}\AgdaSymbol{)}\<%
-\\
-%
-\\
-\>\AgdaFunction{patch} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{t} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{p} \AgdaDatatype{⊏} \AgdaBound{t} \AgdaSymbol{→} \AgdaDatatype{Tree}\<%
-\\
+\end{code}
+
+Напишем функцию применения патча. Она принимает патч, дерево и 
+доказательство того, что этот патч можно применить.
+
+\begin{code}%
+\>\AgdaFunction{patch} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{t} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{p} \AgdaDatatype{⊏} \AgdaBound{t} \AgdaSymbol{→} \AgdaDatatype{Tree}\<%
+\end{code}
+
+Применение пустого патча ничего не делает.
+
+\begin{code}%
 \>\AgdaFunction{patch} \AgdaInductiveConstructor{I} \AgdaBound{t} \AgdaSymbol{(}\AgdaInductiveConstructor{⊏-I} \AgdaSymbol{.}\AgdaBound{t}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaBound{t}\<%
-\\
+\end{code}
+
+Замена дерева заменяет дерево. % (!)
+
+\begin{code}%
 \>\AgdaFunction{patch} \AgdaInductiveConstructor{⟨} \AgdaSymbol{.}\AgdaBound{t} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩} \AgdaBound{t} \AgdaSymbol{(}\AgdaInductiveConstructor{⊏-⇒} \AgdaSymbol{.}\AgdaBound{t} \AgdaSymbol{.}\AgdaBound{to}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaBound{to}\<%
-\\
-\>\AgdaFunction{patch} \AgdaInductiveConstructor{⟨} \AgdaBound{pl} \AgdaInductiveConstructor{∧} \AgdaBound{pr} \AgdaInductiveConstructor{⟩} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch} \AgdaBound{tl} \AgdaBound{tr}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊏-∧} \AgdaBound{⊏l} \AgdaBound{⊏r}\AgdaSymbol{)} \AgdaSymbol{=} \<[47]%
-\>[47]\<%
+\end{code}
+
+Применить под-патчи к поддеревьям.
+
+\begin{code}%
+\>\AgdaFunction{patch} \AgdaInductiveConstructor{⟨} \AgdaBound{pl} \AgdaInductiveConstructor{∧} \AgdaBound{pr} \AgdaInductiveConstructor{⟩} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch} \AgdaBound{tl} \AgdaBound{tr}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊏-∧} \AgdaBound{l-a} \AgdaBound{r-a}\AgdaSymbol{)} \AgdaSymbol{=} \<[49]%
+\>[49]\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaInductiveConstructor{Branch} \AgdaSymbol{(}\AgdaFunction{patch} \AgdaBound{pl} \AgdaBound{tl} \AgdaBound{⊏l}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaFunction{patch} \AgdaBound{pr} \AgdaBound{tr} \AgdaBound{⊏r}\AgdaSymbol{)}\<%
-\\
-%
-\\
-\>\AgdaFunction{\_\textasciicircum\_} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{sl} \AgdaBound{sr} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{sl} \AgdaDatatype{∥} \AgdaBound{sr} \AgdaSymbol{→} \AgdaDatatype{Shape}\<%
+\>[2]\AgdaInductiveConstructor{Branch} \AgdaSymbol{(}\AgdaFunction{patch} \AgdaBound{pl} \AgdaBound{tl} \AgdaBound{l-a}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaFunction{patch} \AgdaBound{pr} \AgdaBound{tr} \AgdaBound{r-a}\AgdaSymbol{)}\<%
+\end{code}
+
+\subsection{Объединение неконфликтующих патчей}
+
+\begin{figure}
+  \centering
+    \begin{tikzpicture}
+      [level distance=1cm]
+      \node[treev] (lhsr) {}
+      child[treearr] {node[treev] {}
+        child[treearr] {node[rectangle, minimum height=1cm] {}
+        }
+        child[treearr] {node[fill=yellow,rectangle,draw=black] {$A \to B$}
+        }
+      }
+      child[treearr] {node[rectangle, minimum height=1cm] {}
+      };
+      \node[fit=(lhsr)(lhsr-1)(lhsr-1-1)(lhsr-1-2)(lhsr-2)] (lhs) {};
+
+      \node[right=0 of lhs,font=\Huge] (and) {$\wedge$};
+
+      \node[treev, right=2cm of lhsr] (rhsr) {}
+      child[treearr] {node[rectangle, minimum height=1cm] {}
+      }
+      child[treearr] {node[fill=yellow,rectangle,draw=black] {$C \to D$}
+      };
+      \node[fit=(rhsr)(rhsr-1)(lhsr-2)] (rhs) {};
+
+      \node[right=3.3cm of lhs,font=\Huge] (eq) {$=$};
+
+      \node[treev, right=3.4cm of rhsr] (lhsr) {}
+      child[treearr] {node[treev] {}
+        child[treearr] {node[rectangle, minimum height=1cm] {}
+        }
+        child[treearr] {node[fill=yellow,rectangle,draw=black] {$A \to B$}
+        }
+      }
+      child[treearr] {node[fill=yellow,rectangle,draw=black] {$C \to D$}
+      };
+    \end{tikzpicture}
+  \caption{Неконфликтующее объединение патчей}
+  \label{fig:tree-merge-nonconflict}
+\end{figure}
+
+Перед реализацией объединения понадобится несколько вспомогательных
+функций. Объединение двух совместных форм:
+
+\begin{code}%
+\>\AgdaFunction{\_\textasciicircum\_} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{sl} \AgdaBound{sr} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{sl} \AgdaDatatype{∥} \AgdaBound{sr} \AgdaSymbol{→} \AgdaDatatype{Form}\<%
 \\
 \>\AgdaFunction{\_\textasciicircum\_} \AgdaSymbol{.}\AgdaInductiveConstructor{Skip} \AgdaBound{sr} \AgdaSymbol{(}\AgdaInductiveConstructor{∅∥✴} \AgdaSymbol{.}\AgdaBound{sr}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaBound{sr}\<%
 \\
@@ -120,16 +316,20 @@
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaInductiveConstructor{Branch} \AgdaSymbol{((}\AgdaBound{L1} \AgdaFunction{\textasciicircum} \AgdaBound{L2}\AgdaSymbol{)} \AgdaBound{pl}\AgdaSymbol{)} \AgdaSymbol{((}\AgdaBound{R1} \AgdaFunction{\textasciicircum} \AgdaBound{R2}\AgdaSymbol{)} \AgdaBound{pr}\AgdaSymbol{)}\<%
-\\
-%
-\\
-\>\AgdaFunction{unite} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaDatatype{Shape}\<%
+\end{code}
+
+И её более удобная для использования копия:
+
+\begin{code}%
+\>\AgdaFunction{unite} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaDatatype{Form}\<%
 \\
 \>\AgdaFunction{unite} \AgdaSymbol{\{}\AgdaBound{f₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₂}\AgdaSymbol{\}} \AgdaBound{p} \AgdaSymbol{=} \AgdaSymbol{(}\AgdaBound{f₁} \AgdaFunction{\textasciicircum} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaBound{p}\<%
-\\
-%
-\\
-\>\AgdaFunction{\_⋀\_} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{)}\<%
+\end{code}
+
+Непосредственно, объеденение~(рисунок~\ref{fig:tree-merge-nonconflict}):
+
+\begin{code}%
+\>\AgdaFunction{\_⋀\_} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{)}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{s₁∥s₂} \AgdaSymbol{:} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaSymbol{(}\AgdaFunction{unite} \AgdaBound{s₁∥s₂}\AgdaSymbol{)}\<%
@@ -151,12 +351,60 @@
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaInductiveConstructor{⟨} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{⋀} \AgdaBound{p₃}\AgdaSymbol{)} \AgdaBound{s₁∥s₂} \AgdaInductiveConstructor{∧} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaFunction{⋀} \AgdaBound{p₄}\AgdaSymbol{)} \AgdaBound{s₃∥s₄} \AgdaInductiveConstructor{⟩}\<%
+\end{code}
+
+Во всех случаях, кроме последнего, один из операндов равен
+\AgdaInductiveConstructor{I}, поэтому в качестве ответа берётся другой
+операнд. В последнем же случае делаются два рекурсивных запуска от 
+пар левых и правых поддеревьев и результаты берутся как левое и правое
+поддерево результата, соответственно.
+  
+\subsection{Эквивалентность патчей}
+
+\begin{code}%
+\>\<%
+\\
+\>\AgdaFunction{\_⟶\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\<%
+\>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaPrimitiveType{Set}\<%
 \\
-\>\AgdaFunction{patch-lem} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \<[30]%
-\>[30]\<%
+\>\AgdaFunction{\_⟶\_} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaBound{p₁} \AgdaBound{p₂} \AgdaSymbol{=} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{x} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{\}}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁-x} \AgdaSymbol{:} \AgdaBound{p₁} \AgdaDatatype{⊏} \AgdaBound{x}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaRecord{Σ} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaDatatype{⊏} \AgdaBound{x}\AgdaSymbol{)} \AgdaSymbol{(λ} \AgdaBound{p₂-x} \AgdaSymbol{→} \<[43]%
+\>[43]\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaSymbol{(}\AgdaFunction{patch} \AgdaBound{p₁} \AgdaBound{x} \AgdaBound{p₁-x} \AgdaDatatype{≡} \AgdaFunction{patch} \AgdaBound{p₂} \AgdaBound{x} \AgdaBound{p₂-x}\AgdaSymbol{))}\<%
+\\
+%
+\\
+\>\AgdaFunction{\_⟷\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaPrimitiveType{Set}\<%
+\\
+\>\AgdaBound{p₁} \AgdaFunction{⟷} \AgdaBound{p₂} \AgdaSymbol{=} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{⟶} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaRecord{∧} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaFunction{⟶} \AgdaBound{p₁}\AgdaSymbol{)}\<%
+\end{code}
+
+\begin{code}%
+\>\AgdaComment{-- p₁ ⟷ p₂ ─ p₁ операционно эквивалентен p₂}\<%
+\\
+\>\AgdaComment{-- FAIL}\<%
+\\
+\>\AgdaComment{--\_⟷\_ : ∀ \{s₁ s₂ : Form\} }\<%
+\\
+\>\AgdaComment{--  → (p₁ : Patch s₁) → (p₂ : Patch s₂) → Set}\<%
+\\
+\>\AgdaComment{--p₁ ⟷ p₂ = ∀ (x : Tree) → (p₁⊏x : p₁ ⊏ x) → (p₂⊏x : p₂ ⊏ x) }\<%
+\\
+\>\AgdaComment{--  → patch p₁ x p₁⊏x ≡ patch p₂ x p₂⊏x}\<%
+\end{code}
+
+\begin{code}%
+\>\AgdaFunction{patch-lem} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \<[29]%
+\>[29]\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{x} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p} \AgdaSymbol{:} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₂}\AgdaSymbol{)}\<%
@@ -200,7 +448,7 @@
 \\
 %
 \\
-\>\AgdaFunction{∥-comm} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₂} \AgdaSymbol{→} \AgdaBound{s₂} \AgdaDatatype{∥} \AgdaBound{s₁}\<%
+\>\AgdaFunction{∥-comm} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₂} \AgdaSymbol{→} \AgdaBound{s₂} \AgdaDatatype{∥} \AgdaBound{s₁}\<%
 \\
 \>\AgdaFunction{∥-comm} \AgdaSymbol{\{}\AgdaSymbol{.}\AgdaInductiveConstructor{Skip}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{s₂}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaInductiveConstructor{∅∥✴} \AgdaSymbol{.}\AgdaBound{s₂}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{✴∥∅} \AgdaBound{s₂}\<%
 \\
@@ -214,8 +462,8 @@
 \\
 %
 \\
-\>\AgdaFunction{lemma-∥-unite} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaBound{s₃} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \<[35]%
-\>[35]\<%
+\>\AgdaFunction{lemma-∥-unite} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaBound{s₃} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \<[34]%
+\>[34]\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{s₁∥s₂} \AgdaSymbol{:} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{s₂} \AgdaDatatype{∥} \AgdaBound{s₃} \AgdaSymbol{→} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₃}\<%
@@ -229,54 +477,22 @@
 \\
 \>\AgdaFunction{lemma-∥-unite} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch-∥} \AgdaSymbol{\{}\AgdaBound{L1}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{R1}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{L2}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{R2}\AgdaSymbol{\}} \AgdaBound{L1∥L2} \AgdaBound{R1∥R2}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{✴∥∅} \AgdaSymbol{.(}\AgdaInductiveConstructor{Branch} \AgdaBound{L2} \AgdaBound{R2}\AgdaSymbol{)}\AgdaSymbol{)} \AgdaBound{s₁∥s₃} \AgdaSymbol{=} \AgdaInductiveConstructor{✴∥∅} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch} \AgdaSymbol{((}\AgdaBound{L1} \AgdaFunction{\textasciicircum} \AgdaBound{L2}\AgdaSymbol{)} \AgdaBound{L1∥L2}\AgdaSymbol{)} \AgdaSymbol{((}\AgdaBound{R1} \AgdaFunction{\textasciicircum} \AgdaBound{R2}\AgdaSymbol{)} \AgdaBound{R1∥R2}\AgdaSymbol{))}\<%
 \\
-\>\AgdaFunction{lemma-∥-unite} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch-∥} \AgdaBound{L1∥L2} \AgdaBound{R1∥R2}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch-∥} \AgdaBound{s₂∥s₃} \AgdaBound{s₂∥s₄}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch-∥} \AgdaBound{s₁∥s₃} \AgdaBound{s₁∥s₄}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{Branch-∥} \AgdaSymbol{(}\AgdaFunction{lemma-∥-unite} \AgdaBound{L1∥L2} \AgdaBound{s₂∥s₃} \AgdaBound{s₁∥s₃}\AgdaSymbol{)}\<%
-\\
-\>[2]\AgdaIndent{87}{}\<[87]%
-\>[87]\AgdaSymbol{(}\AgdaFunction{lemma-∥-unite} \AgdaBound{R1∥R2} \AgdaBound{s₂∥s₄} \AgdaBound{s₁∥s₄}\AgdaSymbol{)}\<%
-\\
-%
-\\
-\>\AgdaFunction{\_⟶\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}}\<%
+\>\AgdaFunction{lemma-∥-unite} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch-∥} \AgdaBound{L1∥L2} \AgdaBound{R1∥R2}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch-∥} \AgdaBound{s₂∥s₃} \AgdaBound{s₂∥s₄}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch-∥} \AgdaBound{s₁∥s₃} \AgdaBound{s₁∥s₄}\AgdaSymbol{)} \<[83]%
+\>[83]\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaPrimitiveType{Set}\<%
-\\
-\>\AgdaFunction{\_⟶\_} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaBound{p₁} \AgdaBound{p₂} \AgdaSymbol{=} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{x} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{\}}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁-x} \AgdaSymbol{:} \AgdaBound{p₁} \AgdaDatatype{⊏} \AgdaBound{x}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaRecord{Σ} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaDatatype{⊏} \AgdaBound{x}\AgdaSymbol{)} \AgdaSymbol{(λ} \AgdaBound{p₂-x} \AgdaSymbol{→} \<[43]%
-\>[43]\<%
+\>[2]\AgdaSymbol{=} \AgdaInductiveConstructor{Branch-∥} \AgdaSymbol{(}\AgdaFunction{lemma-∥-unite} \AgdaBound{L1∥L2} \AgdaBound{s₂∥s₃} \AgdaBound{s₁∥s₃}\AgdaSymbol{)}\<%
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaSymbol{(}\AgdaFunction{patch} \AgdaBound{p₁} \AgdaBound{x} \AgdaBound{p₁-x} \AgdaDatatype{≡} \AgdaFunction{patch} \AgdaBound{p₂} \AgdaBound{x} \AgdaBound{p₂-x}\AgdaSymbol{))}\<%
+\>[4]\AgdaSymbol{(}\AgdaFunction{lemma-∥-unite} \AgdaBound{R1∥R2} \AgdaBound{s₂∥s₄} \AgdaBound{s₁∥s₄}\AgdaSymbol{)}\<%
 \\
-%
-\\
-\>\AgdaFunction{\_⟷\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaPrimitiveType{Set}\<%
-\\
-\>\AgdaBound{p₁} \AgdaFunction{⟷} \AgdaBound{p₂} \AgdaSymbol{=} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{⟶} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaRecord{∧} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaFunction{⟶} \AgdaBound{p₁}\AgdaSymbol{)}\<%
-\\
-%
-\\
-\>\AgdaComment{-- p₁ ⟷ p₂ ─ p₁ операционно эквивалентен p₂}\<%
-\\
-\>\AgdaComment{-- FAIL}\<%
-\\
-\>\AgdaComment{--\_⟷\_ : ∀ \{s₁ s₂ : Shape\} }\<%
-\\
-\>\AgdaComment{--  → (p₁ : Patch s₁) → (p₂ : Patch s₂) → Set}\<%
-\\
-\>\AgdaComment{--p₁ ⟷ p₂ = ∀ (x : Tree) → (p₁⊏x : p₁ ⊏ x) → (p₂⊏x : p₂ ⊏ x) }\<%
-\\
-\>\AgdaComment{--  → patch p₁ x p₁⊏x ≡ patch p₂ x p₂⊏x}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\<%
-\\
-\>\AgdaFunction{patch-⊏-indep} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{t} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)}\<%
+\>[4]\AgdaIndent{62}{}\<[62]%
+\>[62]\<%
+\end{code}
+
+  
+\begin{code}%
+\>\AgdaFunction{patch-⊏-indep} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{t} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{⊏₁} \AgdaBound{⊏₂} \AgdaSymbol{:} \AgdaBound{p} \AgdaDatatype{⊏} \AgdaBound{t}\AgdaSymbol{)}\<%
@@ -293,11 +509,10 @@
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaKeyword{rewrite} \AgdaFunction{patch-⊏-indep} \AgdaBound{pl} \AgdaBound{tl} \AgdaBound{⊏₁} \AgdaBound{⊏₃} \AgdaSymbol{|} \AgdaFunction{patch-⊏-indep} \AgdaBound{pr} \AgdaBound{tr} \AgdaBound{⊏₂} \AgdaBound{⊏₄} \AgdaSymbol{=} \AgdaInductiveConstructor{refl}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\<%
-\\
-\>\AgdaFunction{∥-comm²≡id} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{s₁∥s₂} \AgdaSymbol{:} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₂}\AgdaSymbol{)}\<%
+\end{code}
+  
+\begin{code}%
+\>\AgdaFunction{∥-comm²≡id} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{s₁∥s₂} \AgdaSymbol{:} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₂}\AgdaSymbol{)}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaSymbol{→} \AgdaBound{s₁∥s₂} \AgdaDatatype{≡} \AgdaFunction{∥-comm} \AgdaSymbol{(}\AgdaFunction{∥-comm} \AgdaBound{s₁∥s₂}\AgdaSymbol{)}\<%
@@ -319,13 +534,12 @@
 \>[5]\AgdaSymbol{|} \AgdaFunction{∥-comm} \AgdaSymbol{(}\AgdaFunction{∥-comm} \AgdaBound{R1∥R2}\AgdaSymbol{)} \AgdaSymbol{|} \AgdaFunction{∥-comm²≡id} \AgdaBound{R1∥R2}\<%
 \\
 \>\AgdaFunction{∥-comm²≡id} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch-∥} \AgdaSymbol{.}\AgdaBound{i1} \AgdaSymbol{.}\AgdaBound{i2}\AgdaSymbol{)} \AgdaSymbol{|} \AgdaBound{i1} \AgdaSymbol{|} \AgdaInductiveConstructor{refl} \AgdaSymbol{|} \AgdaBound{i2} \AgdaSymbol{|} \AgdaInductiveConstructor{refl} \AgdaSymbol{=} \AgdaInductiveConstructor{refl}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\<%
-\\
+\end{code}
+  
+\begin{code}%
 \>\AgdaComment{-- Неправда}\<%
 \\
-\>\AgdaComment{--unite-lem : \{s₁ s₂ : Shape\} → (∥₁ ∥₂ : s₁ ∥ s₂) → ∥₁ ≡ ∥₂}\<%
+\>\AgdaComment{--unite-lem : \{s₁ s₂ : Form\} → (∥₁ ∥₂ : s₁ ∥ s₂) → ∥₁ ≡ ∥₂}\<%
 \\
 \>\AgdaComment{--unite-lem \{.Skip\} \{s₂\} (∅∥✴ .s₂) (∅∥✴ .s₂) = refl}\<%
 \\
@@ -341,23 +555,23 @@
 \\
 \>\AgdaComment{-- Не тайпчекается}\<%
 \\
-\>\AgdaComment{--⋀-∥-indep : \{s₁ s₂ : Shape\} (p₁ : Patch s₁) (p₂ : Patch s₂)}\<%
+\>\AgdaComment{--⋀-∥-indep : \{s₁ s₂ : Form\} (p₁ : Patch s₁) (p₂ : Patch s₂)}\<%
 \\
 \>\AgdaComment{--  → (∥₁ ∥₂ : s₁ ∥ s₂) → }\<%
 \\
 \>\AgdaComment{--  (p₁ ⋀ p₂) ∥₁ ≡ (p₁ ⋀ p₂) ∥₂}\<%
 \\
 \>\AgdaComment{--⋀-∥-indep p₁ p₂ ∥₁ ∥₂ = ?}\<%
-\\
-%
-\\
-\>\AgdaFunction{⟷-refl} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{p} \AgdaFunction{⟷} \AgdaBound{p}\<%
+\end{code}
+
+\begin{code}%
+\>\AgdaFunction{⟷-refl} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{p} \AgdaFunction{⟷} \AgdaBound{p}\<%
 \\
 \>\AgdaFunction{⟷-refl} \AgdaBound{p} \AgdaSymbol{=} \AgdaSymbol{(λ} \AgdaBound{x} \AgdaSymbol{→} \AgdaBound{x} \AgdaInductiveConstructor{,} \AgdaInductiveConstructor{refl}\AgdaSymbol{)} \AgdaInductiveConstructor{,} \AgdaSymbol{(λ} \AgdaBound{x} \AgdaSymbol{→} \AgdaBound{x} \AgdaInductiveConstructor{,} \AgdaInductiveConstructor{refl}\AgdaSymbol{)}\<%
 \\
 %
 \\
-\>\AgdaFunction{⟶-branch} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{L1} \AgdaBound{L2} \AgdaBound{R1} \AgdaBound{R2} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}}\<%
+\>\AgdaFunction{⟶-branch} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{L1} \AgdaBound{L2} \AgdaBound{R1} \AgdaBound{R2} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaSymbol{→} \AgdaSymbol{\{}\AgdaBound{l₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{L1}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{l₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{L2}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{r₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{R1}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{r₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{R2}\AgdaSymbol{\}}\<%
@@ -383,7 +597,7 @@
 \\
 %
 \\
-\>\AgdaFunction{⟷-branch} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{L1} \AgdaBound{L2} \AgdaBound{R1} \AgdaBound{R2} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}}\<%
+\>\AgdaFunction{⟷-branch} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{L1} \AgdaBound{L2} \AgdaBound{R1} \AgdaBound{R2} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaSymbol{→} \AgdaSymbol{\{}\AgdaBound{l₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{L1}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{l₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{L2}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{r₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{R1}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{r₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{R2}\AgdaSymbol{\}}\<%
@@ -396,10 +610,10 @@
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaSymbol{(}\AgdaFunction{⟶-branch} \AgdaBound{l₁⟶l₂} \AgdaBound{r₁⟶r₂}\AgdaSymbol{)} \AgdaInductiveConstructor{,} \AgdaSymbol{(}\AgdaFunction{⟶-branch} \AgdaBound{l₂⟶l₁} \AgdaBound{r₂⟶r₁}\AgdaSymbol{)}\<%
-\\
-%
-\\
-\>\AgdaFunction{⋀-comm} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}}\<%
+\end{code}
+
+\begin{code}%
+\>\AgdaFunction{⋀-comm} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{s₁∥s₂} \AgdaSymbol{:} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₂}\AgdaSymbol{)}\<%
@@ -454,8 +668,8 @@
 \\
 \>\AgdaComment{--   доказательства вылазит куча проблем.}\<%
 \\
-\>\AgdaFunction{⋀-assoc} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaBound{s₃} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \<[31]%
-\>[31]\<%
+\>\AgdaFunction{⋀-assoc} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaBound{s₃} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \<[30]%
+\>[30]\<%
 \\
 \>[1]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{s₁∥s₂} \AgdaSymbol{:} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{s₂∥s₃} \AgdaSymbol{:} \AgdaBound{s₂} \AgdaDatatype{∥} \AgdaBound{s₃}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{s₁∥s₃} \AgdaSymbol{:} \AgdaBound{s₁} \AgdaDatatype{∥} \AgdaBound{s₃}\AgdaSymbol{)}\<%
@@ -594,13 +808,17 @@
 \\
 %
 \\
+%
+\\
+%
+\\
 \>\AgdaKeyword{module} \AgdaModule{⋙-try2} \AgdaKeyword{where}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaKeyword{data} \AgdaDatatype{\_⋙?\_} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
+\>[2]\AgdaKeyword{data} \AgdaDatatype{\_⋙?\_} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{✴⋙?I} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{p} \AgdaDatatype{⋙?} \AgdaInductiveConstructor{I}\<%
+\>[4]\AgdaInductiveConstructor{✴⋙?I} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{p} \AgdaDatatype{⋙?} \AgdaInductiveConstructor{I}\<%
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaInductiveConstructor{Here-⋙?} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{(}\AgdaBound{t₁} \AgdaBound{t₂} \AgdaBound{t₃} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaInductiveConstructor{⟨} \AgdaBound{t₁} \AgdaInductiveConstructor{⇒} \AgdaBound{t₂} \AgdaInductiveConstructor{⟩} \AgdaDatatype{⋙?} \AgdaInductiveConstructor{⟨} \AgdaBound{t₂} \AgdaInductiveConstructor{⇒} \AgdaBound{t₃} \AgdaInductiveConstructor{⟩}\<%
@@ -619,7 +837,7 @@
 \>[6]\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{⋙?-uniq} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{\}}\<%
+\>[2]\AgdaFunction{⋙?-uniq} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{\}}\<%
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{?₁} \AgdaBound{?₂} \AgdaSymbol{:} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{?₁} \AgdaDatatype{≡} \AgdaBound{?₂}\<%
@@ -641,7 +859,7 @@
 \>[2]\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{⋙} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{\}}\<%
+\>[2]\AgdaFunction{⋙} \AgdaSymbol{:} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{\}}\<%
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaSymbol{→} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaBound{s₁}\<%
@@ -659,7 +877,7 @@
 \>[2]\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{⋙-preserves} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{\}}\<%
+\>[2]\AgdaFunction{⋙-preserves} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{\}}\<%
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{?₁} \AgdaBound{?₂} \AgdaSymbol{:} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaFunction{⋙} \AgdaBound{?₁} \AgdaFunction{⟷} \AgdaFunction{⋙} \AgdaBound{?₂}\<%
@@ -684,7 +902,7 @@
 %
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{⋙-assoc} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaBound{s₃} \AgdaSymbol{:} \AgdaDatatype{Shape}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₃} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₃}\AgdaSymbol{\}}\<%
+\>[2]\AgdaFunction{⋙-assoc} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaBound{s₃} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₂}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₃} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{s₃}\AgdaSymbol{\}}\<%
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{1⋙?2} \AgdaSymbol{:} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)}\<%
@@ -776,13 +994,13 @@
 \\
 \>\AgdaComment{-- module ⋙-try1 where}\<%
 \\
-\>\AgdaComment{--   data \_⋙?\_ : \{s₁ s₂ : Shape\} (p₁ : Patch s₁) (p₂ : Patch s₂) → Set where}\<%
+\>\AgdaComment{--   data \_⋙?\_ : \{s₁ s₂ : Form\} (p₁ : Patch s₁) (p₂ : Patch s₂) → Set where}\<%
 \\
-\>\AgdaComment{--     ✴⋙?I : ∀ \{s : Shape\} (p : Patch s) → p ⋙? I}\<%
+\>\AgdaComment{--     ✴⋙?I : ∀ \{s : Form\} (p : Patch s) → p ⋙? I}\<%
 \\
 \>\AgdaComment{--     Here-⋙? : ∀ (t₁ t₂ t₃ : Tree) → ⟨ t₁ ⇒ t₂ ⟩ ⋙? ⟨ t₂ ⇒ t₃ ⟩}\<%
 \\
-\>\AgdaComment{--     There-⋙? : ∀ \{s₁ s₂ : Shape\} \{t₁ t₂ : Tree\} \{p₁ : Patch s₁\} \{p₂ : Patch s₂\}}\<%
+\>\AgdaComment{--     There-⋙? : ∀ \{s₁ s₂ : Form\} \{t₁ t₂ : Tree\} \{p₁ : Patch s₁\} \{p₂ : Patch s₂\}}\<%
 \\
 \>\AgdaComment{--       → (t : Tree) → p₁ ⊏ t₁ → p₂ ⊏ t₂ }\<%
 \\
@@ -796,7 +1014,7 @@
 \\
 \>\AgdaComment{--   }\<%
 \\
-\>\AgdaComment{--   ⋙ : \{s₁ s₂ : Shape\} \{p₁ : Patch s₁\} \{p₂ : Patch s₂\}}\<%
+\>\AgdaComment{--   ⋙ : \{s₁ s₂ : Form\} \{p₁ : Patch s₁\} \{p₂ : Patch s₂\}}\<%
 \\
 \>\AgdaComment{--     → p₁ ⋙? p₂ → Patch s₁}\<%
 \\
@@ -812,7 +1030,7 @@
 \\
 \>\AgdaComment{--   }\<%
 \\
-\>\AgdaComment{--   ⋙-assoc : ∀ \{s₁ s₂ s₃ : Shape\} \{p₁ : Patch s₁\} \{p₂ : Patch s₂\} \{p₃ : Patch s₃\}}\<%
+\>\AgdaComment{--   ⋙-assoc : ∀ \{s₁ s₂ s₃ : Form\} \{p₁ : Patch s₁\} \{p₂ : Patch s₂\} \{p₃ : Patch s₃\}}\<%
 \\
 \>\AgdaComment{--     → (1⋙?2 : p₁ ⋙? p₂)}\<%
 \\
