@@ -1,3 +1,4 @@
+\section{Вектора}
 
 \AgdaHide{
 \begin{code}
@@ -12,8 +13,6 @@ module With-⋀-and-⋙ (A : Set) where
 
 \end{code}
 }
-
-\section{Вектора}
 
 \subsection{Форма}
 
@@ -31,6 +30,40 @@ module With-⋀-and-⋙ (A : Set) where
   Form = Vec Bool 
 \end{code}
 
+Определим для двух форм отношение \emph{совместности}. Две формы
+называются \emph{совместными}, если два патча, обладающие этими
+формами, никогда не будут \emph{конфликтовать}. Формально понятие
+\emph{конфликтования} патчей будет введено позднее. На данный момент,
+можно довериться интуитивному пониманию этого понятия.
+
+\begin{code}
+  data _∥_ : ∀ {n} → Form n → Form n → Set where
+    []∥[] : [] ∥ []
+    ⊥∥⊥ : ∀ {n}{f₁ f₂ : Form n} → f₁ ∥ f₂ → (false ∷ f₁) ∥ (false ∷ f₂)
+    ⊤∥⊥ : ∀ {n}{f₁ f₂ : Form n} → f₁ ∥ f₂ → (true ∷ f₁) ∥ (false ∷ f₂)
+    ⊥∥⊤ : ∀ {n}{f₁ f₂ : Form n} → f₁ ∥ f₂ → (false ∷ f₁) ∥ (true ∷ f₂)
+\end{code}
+
+Здесь дано индуктивное опеределение совместности форм, которое гласит,
+что пустые формы совместны, а непустые совместны, если первыми
+элементами в них идут не два \AgdaInductiveConstructor{true}.
+
+Например, формы 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} 
+и 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
+\end{tikzpicture} 
+совместны, а 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} и 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecff \\};
+\end{tikzpicture}~--- нет.
+    
 \subsection{Патч}
 
 Теперь определим \emph{патч}, индексированный только что опеределённой
@@ -95,42 +128,7 @@ module With-⋀-and-⋙ (A : Set) where
 пятой~--- на $y$. На рисунке~\ref{fig:vec-patch-example-form}
 изображена его форма: вторая и пятая позиции меняются.
 
-\subsection{Совместные формы}
-
-Определим для двух форм отношение \emph{совместности}. Две формы
-называются \emph{совместными}, если два патча, обладающие этими
-формами, никогда не будут \emph{конфликтовать}. Формально понятие
-\emph{конфликтования} патчей будет введено позднее. На данный момент,
-можно довериться интуитивному пониманию этого понятия.
-
-\begin{code}
-  data _∥_ : ∀ {n} → Form n → Form n → Set where
-    []∥[] : [] ∥ []
-    ⊥∥⊥ : ∀ {n}{f₁ f₂ : Form n} → f₁ ∥ f₂ → (false ∷ f₁) ∥ (false ∷ f₂)
-    ⊤∥⊥ : ∀ {n}{f₁ f₂ : Form n} → f₁ ∥ f₂ → (true ∷ f₁) ∥ (false ∷ f₂)
-    ⊥∥⊤ : ∀ {n}{f₁ f₂ : Form n} → f₁ ∥ f₂ → (false ∷ f₁) ∥ (true ∷ f₂)
-\end{code}
-
-Здесь дано индуктивное опеределение совместности форм, которое гласит,
-что пустые формы совместны, а непустые совместны, если первыми
-элементами в них идут не два \AgdaInductiveConstructor{true}.
-
-Например, формы 
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
-\end{tikzpicture} 
-и 
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
-\end{tikzpicture} 
-совместны, а 
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
-\end{tikzpicture} и 
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecfe & \vecff & \vecff & \vecff \\};
-\end{tikzpicture}~--- нет.
-    
+\AgdaHide{
 \subsection{TODO ??? Вложенность патчей}
 
 \begin{code}
@@ -139,48 +137,8 @@ module With-⋀-and-⋙ (A : Set) where
     ⊂⊤ : ∀ {n}{f₁ f₂ : Form n} → (b : Bool) → (b ∷ f₁) ⊂ (true ∷ f₂)
     ⊥⊂⊥ : ∀ {n}{f₁ f₂ : Form n} → (false ∷ f₁) ⊂ (false ∷ f₂)
 \end{code}
+}
 
-\subsection{Возможность композиции конфликтующих патчей}
-
-Введём для двух, возможно, конфликтующих, патчей отношение
-\emph{возможности быть применёнными последовательно}. Разрешим второму
-патчу менять только то, что уже поменял первый. 
-    
-\begin{code}
-  data _⋙?_ : ∀ {n}{f₁ f₂ : Form n} → Patch f₁ → Patch f₂ → Set where  
-\end{code}
-
-Пустые патчи можно применять последовательно. 
-
-\begin{code}
-    O⋙?O : O ⋙? O
-\end{code}
-
-Оба патча не меняют первый элемент. 
-
-\begin{code}
-    ⊥⋙?⊥ : ∀ {n}{f₁ f₂ : Form n} {p₁ : Patch f₁} {p₂ : Patch f₂}
-      → (p₁ ⋙? p₂) → (⊥∷ p₁) ⋙? (⊥∷ p₂)
-\end{code}
-
-Только первый патч меняет первый элемент.
-
-\begin{code}
-    ⊤⋙?⊥ : ∀ {n}{f₁ f₂ : Form n} {p₁ : Patch f₁} {p₂ : Patch f₂}
-      → (from to : A) → (p₁ ⋙? p₂)
-      → (⟨ from ⇒ to ⟩∷ p₁) ⋙? (⊥∷ p₂)
-\end{code}
-
-Оба патча меняют первый элемент.
-
-\begin{code}
-    ⊤⋙?⊤ : ∀ {n}{f₁ f₂ : Form n} {p₁ : Patch f₁} {p₂ : Patch f₂}
-      → (from to to₂ : A) → (p₁ ⋙? p₂)
-      → (⟨ from ⇒ to ⟩∷ p₁) ⋙? (⟨ to ⇒ to₂ ⟩∷ p₂)
-\end{code}
-
-\subsection{Возможность применения патча к вектору}
-    
 Определим для патча и вектора отношение <<\emph{можно применить к}>>.
 Будем говорить, что патч \AgdaBound{p} можно применить к вектору
 \AgdaBound{v}, если на тех местах вектора, где в форме у \AgdaBound{p}
@@ -213,8 +171,6 @@ module With-⋀-and-⋙ (A : Set) where
       → p ⊏ v → (⟨ a ⇒ b ⟩∷ p) ⊏ (a ∷ v)
 \end{code}
 
-\subsection{Применение патча}
-
 Напишем функцию применения патча \AgdaBound{p} к вектору
 \AgdaBound{x}. Функция принимает на вход патч \AgdaBound{p}, вектор
 \AgdaBound{x} и доказательство того, что \AgdaBound{p} можно применить
@@ -242,6 +198,72 @@ module With-⋀-and-⋙ (A : Set) where
   patch (⟨ .f ⇒ t ⟩∷ p) (f ∷ xs) (⊤⊏ .f .t p-xs) = 
     t ∷ patch p xs p-xs
 \end{code}
+
+\subsection{Эквивалентность патчей}
+
+Введём над патчами отношение \emph{эквивалентности}. Назовём патчи
+эквивалентными, если:
+
+\begin{itemize}
+\item их можно применять к одним и тем же векторам;
+\item при применении к одному и тому же вектору получается одно и то же.
+\end{itemize}
+
+\begin{code}
+  _⟶_ : ∀ {n}{f₁ f₂ : Form n}
+    → (p₁ : Patch f₁) → (p₂ : Patch f₂) → Set
+  _⟶_ {n} p₁ p₂ = ∀ (x : Vec A n) 
+    → (p₁-x : p₁ ⊏ x) → Σ (p₂ ⊏ x) (λ p₂-x → 
+      (patch p₁ x p₁-x ≡ patch p₂ x p₂-x))
+\end{code}
+      
+\begin{code}
+  _⟷_ : ∀ {n}{f₁ f₂ : Form n}
+    → (p₁ : Patch f₁) → (p₂ : Patch f₂) → Set
+  p₁ ⟷ p₂ = (p₁ ⟶ p₂) ∧ (p₂ ⟶ p₁)
+\end{code}
+
+Для того, чтобы отношение $\approx$ было отношением эквивалентности,
+нужно, чтобы оно было:
+
+\begin{itemize}
+\item рефлексивным: $a \approx a$;
+\item симметричным: $a \approx b \to b \approx a$;
+\item транзитивным: $(a \approx b) \wedge (b \approx c) \to (a \approx c)$.
+\end{itemize}
+
+Все эти три свойства можно доказать.
+
+\AgdaHide{
+\begin{code}
+  module ⟷-equiv where
+    ⟷-refl : ∀ {n}{f : Form n} → (p : Patch f)
+      → p ⟷ p
+    ⟷-refl p = (λ x x₁ → x₁ , refl) , (λ x x₁ → x₁ , refl)
+
+    ⟶-trans : ∀ {n}{f₁ f₂ f₃ : Form n}
+      → {p₁ : Patch f₁}{p₂ : Patch f₂}{p₃ : Patch f₃}
+      → (p₁ ⟶ p₂) → (p₂ ⟶ p₃) → (p₁ ⟶ p₃)
+    ⟶-trans {p₁ = p₁}{p₂}{p₃} p₁⟶p₂ p₂⟶p₃ x p₁⊏x 
+      with patch p₁ x p₁⊏x | p₁⟶p₂ x p₁⊏x
+    ... | .(patch p₂ x p₂⊏x) | p₂⊏x , refl = p₂⟶p₃ x p₂⊏x
+  
+    ⟷-trans : ∀ {n}{f₁ f₂ f₃ : Form n}
+      → {p₁ : Patch f₁}{p₂ : Patch f₂}{p₃ : Patch f₃}
+      → (p₁ ⟷ p₂) → (p₂ ⟷ p₃) → (p₁ ⟷ p₃)
+    ⟷-trans (p₁⟶p₂ , p₂⟶p₁) (p₂⟶p₃ , p₃⟶p₂) = 
+      (⟶-trans p₁⟶p₂ p₂⟶p₃) , (⟶-trans p₃⟶p₂ p₂⟶p₁)
+      
+    ⟷-symm : ∀ {n}{f₁ f₂ : Form n}
+      → {p₁ : Patch f₁} {p₂ : Patch f₂}
+      → (p₁ ⟷ p₂) → (p₂ ⟷ p₁)
+    ⟷-symm p₁⟷p₂ = snd p₁⟷p₂ , fst p₁⟷p₂
+
+  open ⟷-equiv
+\end{code}
+}
+
+TODO неправильное определение ⟷.
 
 \subsection{Объединение неконфликтующих патчей}
 
@@ -310,117 +332,6 @@ module With-⋀-and-⋙ (A : Set) where
   \caption{Неконфликтующее объединение векторов}
   \label{fig:vec-merge-nonconflict}
 \end{figure}
-
-\subsection{Объединение конфликтующих патчей}
-
-Как уже оговаривалось выше, при конфликтующем объединении патчей
-считается, что второй патч меняет только то, что уже изменил первый.
-Напишем функцию, которая последовательно применяет два патча,
-обладающие таким свойством. Пример использования изображён на 
-рисунке~\ref{fig:vec-merge-conflict}.
-
-\begin{code}
-  _⋙ₚ_ : ∀ {n} {f₁ f₂ : Form n} (p₁ : Patch f₁) (p₂ : Patch f₂)
-    → (p₁ ⋙? p₂) → Patch f₁
-  _⋙ₚ_ O O O⋙?O = O
-  _⋙ₚ_ (⊥∷ p₁) (⊥∷ p₂) (⊥⋙?⊥ p₁-p₂) = ⊥∷ ((p₁ ⋙ₚ p₂) p₁-p₂)
-  _⋙ₚ_ (⟨ a ⇒ b ⟩∷ p₁) (⊥∷ p₂) (⊤⋙?⊥ .a .b p₁-p₂) = 
-    ⟨ a ⇒ b ⟩∷ ((p₁ ⋙ₚ p₂) p₁-p₂)
-  _⋙ₚ_ (⟨ a ⇒ .b ⟩∷ p₁) (⟨ b ⇒ c ⟩∷ p₂) (⊤⋙?⊤ .a .b .c p₁-p₂) = 
-    ⟨ a ⇒ c ⟩∷ ((p₁ ⋙ₚ p₂) p₁-p₂)
-\end{code}
-
-\begin{figure}
-  \centering
-  \begin{tikzpicture}
-    \matrix [draw=red] (lhs)
-    {\vecf & \vect{a}{b} & \vect{x}{y} & \vecf & \vect{z}{y} \\};
-
-    \node [vecpatch-op, right=0 of lhs] {$\ggg$};
-
-    \matrix [draw=red, below=3mm of lhs] (rhs)
-    {\vecf & \vect{b}{c} & \vecf       & \vecf & \vect{y}{x} \\};
-
-    \node [vecpatch-op, left=0 of rhs] {$\ggg$};
-    \node [vecpatch-op, right=0 of rhs] {$=$};
-          
-    \matrix [draw=red, below=3mm of rhs] (res)
-    {\vecf & \vect{a}{c} & \vect{x}{y} & \vecf & \vect{z}{x} \\};
-          
-    \node [vecpatch-op, left=0 of res] {$=$};
-  \end{tikzpicture}
-  \caption{Конфликтующее объединение векторов}
-  \label{fig:vec-merge-conflict}
-\end{figure}
-
-
-\subsection{Эквивалентность патчей}
-
-Введём над патчами отношение \emph{эквивалентности}. Назовём патчи
-эквивалентными, если:
-
-\begin{itemize}
-\item их можно применять к одним и тем же векторам;
-\item при применении к одному и тому же вектору получается одно и то же.
-\end{itemize}
-
-\begin{code}
-  _⟶_ : ∀ {n}{f₁ f₂ : Form n}
-    → (p₁ : Patch f₁) → (p₂ : Patch f₂) → Set
-  _⟶_ {n} p₁ p₂ = ∀ (x : Vec A n) 
-    → (p₁-x : p₁ ⊏ x) → Σ (p₂ ⊏ x) (λ p₂-x → 
-      (patch p₁ x p₁-x ≡ patch p₂ x p₂-x))
-\end{code}
-      
-\begin{code}
-  _⟷_ : ∀ {n}{f₁ f₂ : Form n}
-    → (p₁ : Patch f₁) → (p₂ : Patch f₂) → Set
-  p₁ ⟷ p₂ = (p₁ ⟶ p₂) ∧ (p₂ ⟶ p₁)
-\end{code}
-
-Для того, чтобы отношение $\approx$ было отношением эквивалентности,
-нужно, чтобы оно было:
-
-\begin{itemize}
-\item рефлексивным: $a \approx a$;
-\item симметричным: $a \approx b \to b \approx a$;
-\item транзитивным: $(a \approx b) \wedge (b \approx c) \to (a \approx c)$.
-\end{itemize}
-
-Все эти три свойства можно доказать.
-
-\AgdaHide{
-\begin{code}
-  module ⟷-equiv where
-    ⟷-refl : ∀ {n}{f : Form n} → (p : Patch f)
-      → p ⟷ p
-    ⟷-refl p = (λ x x₁ → x₁ , refl) , (λ x x₁ → x₁ , refl)
-
-    ⟶-trans : ∀ {n}{f₁ f₂ f₃ : Form n}
-      → {p₁ : Patch f₁}{p₂ : Patch f₂}{p₃ : Patch f₃}
-      → (p₁ ⟶ p₂) → (p₂ ⟶ p₃) → (p₁ ⟶ p₃)
-    ⟶-trans {p₁ = p₁}{p₂}{p₃} p₁⟶p₂ p₂⟶p₃ x p₁⊏x 
-      with patch p₁ x p₁⊏x | p₁⟶p₂ x p₁⊏x
-    ... | .(patch p₂ x p₂⊏x) | p₂⊏x , refl = p₂⟶p₃ x p₂⊏x
-  
-    ⟷-trans : ∀ {n}{f₁ f₂ f₃ : Form n}
-      → {p₁ : Patch f₁}{p₂ : Patch f₂}{p₃ : Patch f₃}
-      → (p₁ ⟷ p₂) → (p₂ ⟷ p₃) → (p₁ ⟷ p₃)
-    ⟷-trans (p₁⟶p₂ , p₂⟶p₁) (p₂⟶p₃ , p₃⟶p₂) = 
-      (⟶-trans p₁⟶p₂ p₂⟶p₃) , (⟶-trans p₃⟶p₂ p₂⟶p₁)
-      
-    ⟷-symm : ∀ {n}{f₁ f₂ : Form n}
-      → {p₁ : Patch f₁} {p₂ : Patch f₂}
-      → (p₁ ⟷ p₂) → (p₂ ⟷ p₁)
-    ⟷-symm p₁⟷p₂ = snd p₁⟷p₂ , fst p₁⟷p₂
-
-  open ⟷-equiv
-\end{code}
-}
-
-TODO неправильное определение ⟷.
-
-\subsection{Свойства \AgdaFunction{\_∧\_}}
 
 \AgdaHide{
 \begin{code}
@@ -545,7 +456,86 @@ TODO неправильное определение ⟷.
 \end{code}
 }
 
-\subsection{Свойства \AgdaFunction{\_⋙\_}}
+
+\subsection{Объединение конфликтующих патчей}
+
+Введём для двух, возможно, конфликтующих, патчей отношение
+\emph{возможности быть применёнными последовательно}. Разрешим второму
+патчу менять только то, что уже поменял первый. 
+    
+\begin{code}
+  data _⋙?_ : ∀ {n}{f₁ f₂ : Form n} → Patch f₁ → Patch f₂ → Set where  
+\end{code}
+
+Пустые патчи можно применять последовательно. 
+
+\begin{code}
+    O⋙?O : O ⋙? O
+\end{code}
+
+Оба патча не меняют первый элемент. 
+
+\begin{code}
+    ⊥⋙?⊥ : ∀ {n}{f₁ f₂ : Form n} {p₁ : Patch f₁} {p₂ : Patch f₂}
+      → (p₁ ⋙? p₂) → (⊥∷ p₁) ⋙? (⊥∷ p₂)
+\end{code}
+
+Только первый патч меняет первый элемент.
+
+\begin{code}
+    ⊤⋙?⊥ : ∀ {n}{f₁ f₂ : Form n} {p₁ : Patch f₁} {p₂ : Patch f₂}
+      → (from to : A) → (p₁ ⋙? p₂)
+      → (⟨ from ⇒ to ⟩∷ p₁) ⋙? (⊥∷ p₂)
+\end{code}
+
+Оба патча меняют первый элемент.
+
+\begin{code}
+    ⊤⋙?⊤ : ∀ {n}{f₁ f₂ : Form n} {p₁ : Patch f₁} {p₂ : Patch f₂}
+      → (from to to₂ : A) → (p₁ ⋙? p₂)
+      → (⟨ from ⇒ to ⟩∷ p₁) ⋙? (⟨ to ⇒ to₂ ⟩∷ p₂)
+\end{code}
+
+
+Как уже оговаривалось выше, при конфликтующем объединении патчей
+считается, что второй патч меняет только то, что уже изменил первый.
+Напишем функцию, которая последовательно применяет два патча,
+обладающие таким свойством. Пример использования изображён на 
+рисунке~\ref{fig:vec-merge-conflict}.
+
+\begin{code}
+  _⋙ₚ_ : ∀ {n} {f₁ f₂ : Form n} (p₁ : Patch f₁) (p₂ : Patch f₂)
+    → (p₁ ⋙? p₂) → Patch f₁
+  _⋙ₚ_ O O O⋙?O = O
+  _⋙ₚ_ (⊥∷ p₁) (⊥∷ p₂) (⊥⋙?⊥ p₁-p₂) = ⊥∷ ((p₁ ⋙ₚ p₂) p₁-p₂)
+  _⋙ₚ_ (⟨ a ⇒ b ⟩∷ p₁) (⊥∷ p₂) (⊤⋙?⊥ .a .b p₁-p₂) = 
+    ⟨ a ⇒ b ⟩∷ ((p₁ ⋙ₚ p₂) p₁-p₂)
+  _⋙ₚ_ (⟨ a ⇒ .b ⟩∷ p₁) (⟨ b ⇒ c ⟩∷ p₂) (⊤⋙?⊤ .a .b .c p₁-p₂) = 
+    ⟨ a ⇒ c ⟩∷ ((p₁ ⋙ₚ p₂) p₁-p₂)
+\end{code}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \matrix [draw=red] (lhs)
+    {\vecf & \vect{a}{b} & \vect{x}{y} & \vecf & \vect{z}{y} \\};
+
+    \node [vecpatch-op, right=0 of lhs] {$\ggg$};
+
+    \matrix [draw=red, below=3mm of lhs] (rhs)
+    {\vecf & \vect{b}{c} & \vecf       & \vecf & \vect{y}{x} \\};
+
+    \node [vecpatch-op, left=0 of rhs] {$\ggg$};
+    \node [vecpatch-op, right=0 of rhs] {$=$};
+          
+    \matrix [draw=red, below=3mm of rhs] (res)
+    {\vecf & \vect{a}{c} & \vect{x}{y} & \vecf & \vect{z}{x} \\};
+          
+    \node [vecpatch-op, left=0 of res] {$=$};
+  \end{tikzpicture}
+  \caption{Конфликтующее объединение векторов}
+  \label{fig:vec-merge-conflict}
+\end{figure}
 
 \AgdaHide{
 \begin{code}

@@ -1,3 +1,4 @@
+\section{Вектора}
 
 \AgdaHide{
 \begin{code}%
@@ -23,8 +24,6 @@
 \end{code}
 }
 
-\section{Вектора}
-
 \subsection{Форма}
 
 Построим систему контроля версий, в которой под контролем версий будут
@@ -44,6 +43,49 @@
 \>[2]\AgdaFunction{Form} \AgdaSymbol{=} \AgdaDatatype{Vec} \AgdaDatatype{Bool} \<%
 \end{code}
 
+Определим для двух форм отношение \emph{совместности}. Две формы
+называются \emph{совместными}, если два патча, обладающие этими
+формами, никогда не будут \emph{конфликтовать}. Формально понятие
+\emph{конфликтования} патчей будет введено позднее. На данный момент,
+можно довериться интуитивному пониманию этого понятия.
+
+\begin{code}%
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaKeyword{data} \AgdaDatatype{\_∥\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaFunction{Form} \AgdaBound{n} \AgdaSymbol{→} \AgdaFunction{Form} \AgdaBound{n} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{[]∥[]} \AgdaSymbol{:} \AgdaInductiveConstructor{[]} \AgdaDatatype{∥} \AgdaInductiveConstructor{[]}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{⊥∥⊥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaDatatype{∥} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{⊤∥⊥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaDatatype{∥} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{⊥∥⊤} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaDatatype{∥} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)}\<%
+\end{code}
+
+Здесь дано индуктивное опеределение совместности форм, которое гласит,
+что пустые формы совместны, а непустые совместны, если первыми
+элементами в них идут не два \AgdaInductiveConstructor{true}.
+
+Например, формы 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} 
+и 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
+\end{tikzpicture} 
+совместны, а 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} и 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecff \\};
+\end{tikzpicture}~--- нет.
+    
 \subsection{Патч}
 
 Теперь определим \emph{патч}, индексированный только что опеределённой
@@ -116,51 +158,7 @@
 пятой~--- на $y$. На рисунке~\ref{fig:vec-patch-example-form}
 изображена его форма: вторая и пятая позиции меняются.
 
-\subsection{Совместные формы}
-
-Определим для двух форм отношение \emph{совместности}. Две формы
-называются \emph{совместными}, если два патча, обладающие этими
-формами, никогда не будут \emph{конфликтовать}. Формально понятие
-\emph{конфликтования} патчей будет введено позднее. На данный момент,
-можно довериться интуитивному пониманию этого понятия.
-
-\begin{code}%
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaKeyword{data} \AgdaDatatype{\_∥\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaFunction{Form} \AgdaBound{n} \AgdaSymbol{→} \AgdaFunction{Form} \AgdaBound{n} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{[]∥[]} \AgdaSymbol{:} \AgdaInductiveConstructor{[]} \AgdaDatatype{∥} \AgdaInductiveConstructor{[]}\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{⊥∥⊥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaDatatype{∥} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)}\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{⊤∥⊥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaDatatype{∥} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)}\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{⊥∥⊤} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaDatatype{∥} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)}\<%
-\end{code}
-
-Здесь дано индуктивное опеределение совместности форм, которое гласит,
-что пустые формы совместны, а непустые совместны, если первыми
-элементами в них идут не два \AgdaInductiveConstructor{true}.
-
-Например, формы 
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
-\end{tikzpicture} 
-и 
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
-\end{tikzpicture} 
-совместны, а 
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
-\end{tikzpicture} и 
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecfe & \vecff & \vecff & \vecff \\};
-\end{tikzpicture}~--- нет.
-    
+\AgdaHide{
 \subsection{TODO ??? Вложенность патчей}
 
 \begin{code}%
@@ -176,64 +174,8 @@
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaInductiveConstructor{⊥⊂⊥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaDatatype{⊂} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)}\<%
 \end{code}
+}
 
-\subsection{Возможность композиции конфликтующих патчей}
-
-Введём для двух, возможно, конфликтующих, патчей отношение
-\emph{возможности быть применёнными последовательно}. Разрешим второму
-патчу менять только то, что уже поменял первый. 
-    
-\begin{code}%
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaKeyword{data} \AgdaDatatype{\_⋙?\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaBound{f₁} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where} \<[71]%
-\>[71]\<%
-\end{code}
-
-Пустые патчи можно применять последовательно. 
-
-\begin{code}%
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{O⋙?O} \AgdaSymbol{:} \AgdaInductiveConstructor{O} \AgdaDatatype{⋙?} \AgdaInductiveConstructor{O}\<%
-\end{code}
-
-Оба патча не меняют первый элемент. 
-
-\begin{code}%
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{⊥⋙?⊥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{\}}\<%
-\\
-\>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)}\<%
-\end{code}
-
-Только первый патч меняет первый элемент.
-
-\begin{code}%
-\>[0]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{⊤⋙?⊥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{\}}\<%
-\\
-\>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{from} \AgdaBound{to} \AgdaSymbol{:} \AgdaBound{A}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)}\<%
-\\
-\>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)}\<%
-\end{code}
-
-Оба патча меняют первый элемент.
-
-\begin{code}%
-\>[0]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{⊤⋙?⊤} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{\}}\<%
-\\
-\>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{from} \AgdaBound{to} \AgdaBound{to₂} \AgdaSymbol{:} \AgdaBound{A}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)}\<%
-\\
-\>[4]\AgdaIndent{6}{}\<[6]%
-\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{to} \AgdaInductiveConstructor{⇒} \AgdaBound{to₂} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)}\<%
-\end{code}
-
-\subsection{Возможность применения патча к вектору}
-    
 Определим для патча и вектора отношение <<\emph{можно применить к}>>.
 Будем говорить, что патч \AgdaBound{p} можно применить к вектору
 \AgdaBound{v}, если на тех местах вектора, где в форме у \AgdaBound{p}
@@ -276,8 +218,6 @@
 \>[6]\AgdaSymbol{→} \AgdaBound{p} \AgdaDatatype{⊏} \AgdaBound{v} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{b} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p}\AgdaSymbol{)} \AgdaDatatype{⊏} \AgdaSymbol{(}\AgdaBound{a} \AgdaInductiveConstructor{∷} \AgdaBound{v}\AgdaSymbol{)}\<%
 \end{code}
 
-\subsection{Применение патча}
-
 Напишем функцию применения патча \AgdaBound{p} к вектору
 \AgdaBound{x}. Функция принимает на вход патч \AgdaBound{p}, вектор
 \AgdaBound{x} и доказательство того, что \AgdaBound{p} можно применить
@@ -312,166 +252,6 @@
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaBound{t} \AgdaInductiveConstructor{∷} \AgdaFunction{patch} \AgdaBound{p} \AgdaBound{xs} \AgdaBound{p-xs}\<%
 \end{code}
-
-\subsection{Объединение неконфликтующих патчей}
-
-Введём функцию, строяющую по двум совместным формам их объединение.
-Эта функция просто будет считать поэлементное <<или>> двух форм.
-Например, 
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
-\end{tikzpicture} \AgdaFunction{∧ₛ}
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
-\end{tikzpicture} \AgdaFunction{≡}
-\begin{tikzpicture}\matrix 
-{\vecfe & \vecff & \vecff & \vecff & \vecff \\};
-\end{tikzpicture}
-
-\begin{code}%
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_∧ₛ\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaFunction{Form} \AgdaBound{n}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_∧ₛ\_} \AgdaInductiveConstructor{[]} \AgdaInductiveConstructor{[]} \AgdaInductiveConstructor{[]∥[]} \AgdaSymbol{=} \AgdaInductiveConstructor{[]}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_∧ₛ\_} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{xs}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{ys}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊥} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaSymbol{(}\AgdaBound{xs} \AgdaFunction{∧ₛ} \AgdaBound{ys}\AgdaSymbol{)} \AgdaBound{p}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_∧ₛ\_} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{xs}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{ys}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤∥⊥} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaSymbol{(}\AgdaBound{xs} \AgdaFunction{∧ₛ} \AgdaBound{ys}\AgdaSymbol{)} \AgdaBound{p}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_∧ₛ\_} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{xs}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{ys}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊤} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaSymbol{(}\AgdaBound{xs} \AgdaFunction{∧ₛ} \AgdaBound{ys}\AgdaSymbol{)} \AgdaBound{p}\<%
-\\
-%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{unite} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaFunction{Form} \AgdaBound{n}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{unite} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₂}\AgdaSymbol{\}} \AgdaBound{p} \AgdaSymbol{=} \AgdaSymbol{(}\AgdaBound{f₁} \AgdaFunction{∧ₛ} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaBound{p}\<%
-\end{code}
-
-На основе этой функции определим функцию, которая по двум патчам с
-совместными формами построит их объединение. Патч-объединение будет
-изменять значение на позиции, если хотя бы в одном из объединяемых
-патчей изменение на этой позиции было. Пример использования
-\AgdaFunction{\_∧ₚ\_} изображён на
-рисунке~\ref{fig:vec-merge-nonconflict}.
-
-\begin{code}%
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_∧ₚ\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{)}\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{f₁∥f₂} \AgdaSymbol{:} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaSymbol{(}\AgdaFunction{unite} \AgdaBound{f₁∥f₂}\AgdaSymbol{)} \<[49]%
-\>[49]\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_∧ₚ\_} \AgdaInductiveConstructor{O} \AgdaInductiveConstructor{O} \AgdaInductiveConstructor{[]∥[]} \AgdaSymbol{=} \AgdaInductiveConstructor{O}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_∧ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊥} \AgdaBound{f₁∥f₂}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{⊥∷} \AgdaSymbol{((}\AgdaBound{p₁} \AgdaFunction{∧ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{f₁∥f₂}\AgdaSymbol{)}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_∧ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊤} \AgdaBound{f₁∥f₂}\AgdaSymbol{)} \AgdaSymbol{=} \<[49]%
-\>[49]\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{∧ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{f₁∥f₂}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_∧ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤∥⊥} \AgdaBound{f₁∥f₂}\AgdaSymbol{)} \AgdaSymbol{=} \<[49]%
-\>[49]\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{∧ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{f₁∥f₂}\<%
-\end{code}
-
-\begin{figure}
-  \centering
-  \begin{tikzpicture}
-    \matrix [draw=red] (lhs)
-    {\vecf & \vect{a}{b} & \vecf & \vecf       & \vect{z}{b} \\};
-  
-    \node [vecpatch-op, right=0 of lhs] {$\wedge$};
-
-    \matrix [draw=red, below=3mm of lhs] (rhs)
-    {\vecf & \vecf       & \vecf & \vect{x}{x} & \vecf \\};
-
-    \node [vecpatch-op, left=0 of rhs] {$\wedge$};
-    \node [vecpatch-op, right=0 of rhs] {$=$};
-  
-    \matrix [draw=red, below=3mm of rhs] (res)
-    {\vecf & \vect{a}{b} & \vecf & \vect{x}{x} & \vect{z}{b} \\};
-  
-    \node [vecpatch-op, left=0 of res] {$=$};
-  \end{tikzpicture}
-
-  \caption{Неконфликтующее объединение векторов}
-  \label{fig:vec-merge-nonconflict}
-\end{figure}
-
-\subsection{Объединение конфликтующих патчей}
-
-Как уже оговаривалось выше, при конфликтующем объединении патчей
-считается, что второй патч меняет только то, что уже изменил первый.
-Напишем функцию, которая последовательно применяет два патча,
-обладающие таким свойством. Пример использования изображён на 
-рисунке~\ref{fig:vec-merge-conflict}.
-
-\begin{code}%
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_⋙ₚ\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{)}\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaBound{f₁}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_⋙ₚ\_} \AgdaInductiveConstructor{O} \AgdaInductiveConstructor{O} \AgdaInductiveConstructor{O⋙?O} \AgdaSymbol{=} \AgdaInductiveConstructor{O}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_⋙ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥⋙?⊥} \AgdaBound{p₁-p₂}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{⊥∷} \AgdaSymbol{((}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁-p₂}\AgdaSymbol{)}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_⋙ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{b} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤⋙?⊥} \AgdaSymbol{.}\AgdaBound{a} \AgdaSymbol{.}\AgdaBound{b} \AgdaBound{p₁-p₂}\AgdaSymbol{)} \AgdaSymbol{=} \<[52]%
-\>[52]\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{b} \AgdaInductiveConstructor{⟩∷} \AgdaSymbol{((}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁-p₂}\AgdaSymbol{)}\<%
-\\
-\>[0]\AgdaIndent{2}{}\<[2]%
-\>[2]\AgdaFunction{\_⋙ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaSymbol{.}\AgdaBound{b} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{b} \AgdaInductiveConstructor{⇒} \AgdaBound{c} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤⋙?⊤} \AgdaSymbol{.}\AgdaBound{a} \AgdaSymbol{.}\AgdaBound{b} \AgdaSymbol{.}\AgdaBound{c} \AgdaBound{p₁-p₂}\AgdaSymbol{)} \AgdaSymbol{=} \<[64]%
-\>[64]\<%
-\\
-\>[2]\AgdaIndent{4}{}\<[4]%
-\>[4]\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{c} \AgdaInductiveConstructor{⟩∷} \AgdaSymbol{((}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁-p₂}\AgdaSymbol{)}\<%
-\end{code}
-
-\begin{figure}
-  \centering
-  \begin{tikzpicture}
-    \matrix [draw=red] (lhs)
-    {\vecf & \vect{a}{b} & \vect{x}{y} & \vecf & \vect{z}{y} \\};
-
-    \node [vecpatch-op, right=0 of lhs] {$\ggg$};
-
-    \matrix [draw=red, below=3mm of lhs] (rhs)
-    {\vecf & \vect{b}{c} & \vecf       & \vecf & \vect{y}{x} \\};
-
-    \node [vecpatch-op, left=0 of rhs] {$\ggg$};
-    \node [vecpatch-op, right=0 of rhs] {$=$};
-          
-    \matrix [draw=red, below=3mm of rhs] (res)
-    {\vecf & \vect{a}{c} & \vect{x}{y} & \vecf & \vect{z}{x} \\};
-          
-    \node [vecpatch-op, left=0 of res] {$=$};
-  \end{tikzpicture}
-  \caption{Конфликтующее объединение векторов}
-  \label{fig:vec-merge-conflict}
-\end{figure}
-
 
 \subsection{Эквивалентность патчей}
 
@@ -602,7 +382,105 @@
 
 TODO неправильное определение ⟷.
 
-\subsection{Свойства \AgdaFunction{\_∧\_}}
+\subsection{Объединение неконфликтующих патчей}
+
+Введём функцию, строяющую по двум совместным формам их объединение.
+Эта функция просто будет считать поэлементное <<или>> двух форм.
+Например, 
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecfe & \vecfe & \vecff \\};
+\end{tikzpicture} \AgdaFunction{∧ₛ}
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecfe & \vecff & \vecff & \vecfe \\};
+\end{tikzpicture} \AgdaFunction{≡}
+\begin{tikzpicture}\matrix 
+{\vecfe & \vecff & \vecff & \vecff & \vecff \\};
+\end{tikzpicture}
+
+\begin{code}%
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_∧ₛ\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaFunction{Form} \AgdaBound{n}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_∧ₛ\_} \AgdaInductiveConstructor{[]} \AgdaInductiveConstructor{[]} \AgdaInductiveConstructor{[]∥[]} \AgdaSymbol{=} \AgdaInductiveConstructor{[]}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_∧ₛ\_} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{xs}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{ys}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊥} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaSymbol{(}\AgdaBound{xs} \AgdaFunction{∧ₛ} \AgdaBound{ys}\AgdaSymbol{)} \AgdaBound{p}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_∧ₛ\_} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{xs}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{ys}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤∥⊥} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaSymbol{(}\AgdaBound{xs} \AgdaFunction{∧ₛ} \AgdaBound{ys}\AgdaSymbol{)} \AgdaBound{p}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_∧ₛ\_} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{xs}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaSymbol{.}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{ys}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊤} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaSymbol{(}\AgdaBound{xs} \AgdaFunction{∧ₛ} \AgdaBound{ys}\AgdaSymbol{)} \AgdaBound{p}\<%
+\\
+%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{unite} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaFunction{Form} \AgdaBound{n}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{unite} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₂}\AgdaSymbol{\}} \AgdaBound{p} \AgdaSymbol{=} \AgdaSymbol{(}\AgdaBound{f₁} \AgdaFunction{∧ₛ} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaBound{p}\<%
+\end{code}
+
+На основе этой функции определим функцию, которая по двум патчам с
+совместными формами построит их объединение. Патч-объединение будет
+изменять значение на позиции, если хотя бы в одном из объединяемых
+патчей изменение на этой позиции было. Пример использования
+\AgdaFunction{\_∧ₚ\_} изображён на
+рисунке~\ref{fig:vec-merge-nonconflict}.
+
+\begin{code}%
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_∧ₚ\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{)}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{f₁∥f₂} \AgdaSymbol{:} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaSymbol{(}\AgdaFunction{unite} \AgdaBound{f₁∥f₂}\AgdaSymbol{)} \<[49]%
+\>[49]\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_∧ₚ\_} \AgdaInductiveConstructor{O} \AgdaInductiveConstructor{O} \AgdaInductiveConstructor{[]∥[]} \AgdaSymbol{=} \AgdaInductiveConstructor{O}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_∧ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊥} \AgdaBound{f₁∥f₂}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{⊥∷} \AgdaSymbol{((}\AgdaBound{p₁} \AgdaFunction{∧ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{f₁∥f₂}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_∧ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊤} \AgdaBound{f₁∥f₂}\AgdaSymbol{)} \AgdaSymbol{=} \<[49]%
+\>[49]\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{∧ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{f₁∥f₂}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_∧ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤∥⊥} \AgdaBound{f₁∥f₂}\AgdaSymbol{)} \AgdaSymbol{=} \<[49]%
+\>[49]\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaFunction{∧ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{f₁∥f₂}\<%
+\end{code}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \matrix [draw=red] (lhs)
+    {\vecf & \vect{a}{b} & \vecf & \vecf       & \vect{z}{b} \\};
+  
+    \node [vecpatch-op, right=0 of lhs] {$\wedge$};
+
+    \matrix [draw=red, below=3mm of lhs] (rhs)
+    {\vecf & \vecf       & \vecf & \vect{x}{x} & \vecf \\};
+
+    \node [vecpatch-op, left=0 of rhs] {$\wedge$};
+    \node [vecpatch-op, right=0 of rhs] {$=$};
+  
+    \matrix [draw=red, below=3mm of rhs] (res)
+    {\vecf & \vect{a}{b} & \vecf & \vect{x}{x} & \vect{z}{b} \\};
+  
+    \node [vecpatch-op, left=0 of res] {$=$};
+  \end{tikzpicture}
+
+  \caption{Неконфликтующее объединение векторов}
+  \label{fig:vec-merge-nonconflict}
+\end{figure}
 
 \AgdaHide{
 \begin{code}%
@@ -868,7 +746,119 @@ TODO неправильное определение ⟷.
 \end{code}
 }
 
-\subsection{Свойства \AgdaFunction{\_⋙\_}}
+
+\subsection{Объединение конфликтующих патчей}
+
+Введём для двух, возможно, конфликтующих, патчей отношение
+\emph{возможности быть применёнными последовательно}. Разрешим второму
+патчу менять только то, что уже поменял первый. 
+    
+\begin{code}%
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaKeyword{data} \AgdaDatatype{\_⋙?\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaBound{f₁} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where} \<[71]%
+\>[71]\<%
+\end{code}
+
+Пустые патчи можно применять последовательно. 
+
+\begin{code}%
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{O⋙?O} \AgdaSymbol{:} \AgdaInductiveConstructor{O} \AgdaDatatype{⋙?} \AgdaInductiveConstructor{O}\<%
+\end{code}
+
+Оба патча не меняют первый элемент. 
+
+\begin{code}%
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{⊥⋙?⊥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{\}}\<%
+\\
+\>[4]\AgdaIndent{6}{}\<[6]%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)}\<%
+\end{code}
+
+Только первый патч меняет первый элемент.
+
+\begin{code}%
+\>[0]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{⊤⋙?⊥} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{\}}\<%
+\\
+\>[4]\AgdaIndent{6}{}\<[6]%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{from} \AgdaBound{to} \AgdaSymbol{:} \AgdaBound{A}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)}\<%
+\\
+\>[4]\AgdaIndent{6}{}\<[6]%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)}\<%
+\end{code}
+
+Оба патча меняют первый элемент.
+
+\begin{code}%
+\>[0]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{⊤⋙?⊤} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{\}}\<%
+\\
+\>[4]\AgdaIndent{6}{}\<[6]%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{from} \AgdaBound{to} \AgdaBound{to₂} \AgdaSymbol{:} \AgdaBound{A}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)}\<%
+\\
+\>[4]\AgdaIndent{6}{}\<[6]%
+\>[6]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{to} \AgdaInductiveConstructor{⇒} \AgdaBound{to₂} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)}\<%
+\end{code}
+
+
+Как уже оговаривалось выше, при конфликтующем объединении патчей
+считается, что второй патч меняет только то, что уже изменил первый.
+Напишем функцию, которая последовательно применяет два патча,
+обладающие таким свойством. Пример использования изображён на 
+рисунке~\ref{fig:vec-merge-conflict}.
+
+\begin{code}%
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_⋙ₚ\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{)}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaBound{f₁}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_⋙ₚ\_} \AgdaInductiveConstructor{O} \AgdaInductiveConstructor{O} \AgdaInductiveConstructor{O⋙?O} \AgdaSymbol{=} \AgdaInductiveConstructor{O}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_⋙ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥⋙?⊥} \AgdaBound{p₁-p₂}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{⊥∷} \AgdaSymbol{((}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁-p₂}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_⋙ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{b} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤⋙?⊥} \AgdaSymbol{.}\AgdaBound{a} \AgdaSymbol{.}\AgdaBound{b} \AgdaBound{p₁-p₂}\AgdaSymbol{)} \AgdaSymbol{=} \<[52]%
+\>[52]\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{b} \AgdaInductiveConstructor{⟩∷} \AgdaSymbol{((}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁-p₂}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{\_⋙ₚ\_} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaSymbol{.}\AgdaBound{b} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{b} \AgdaInductiveConstructor{⇒} \AgdaBound{c} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤⋙?⊤} \AgdaSymbol{.}\AgdaBound{a} \AgdaSymbol{.}\AgdaBound{b} \AgdaSymbol{.}\AgdaBound{c} \AgdaBound{p₁-p₂}\AgdaSymbol{)} \AgdaSymbol{=} \<[64]%
+\>[64]\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{c} \AgdaInductiveConstructor{⟩∷} \AgdaSymbol{((}\AgdaBound{p₁} \AgdaFunction{⋙ₚ} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaBound{p₁-p₂}\AgdaSymbol{)}\<%
+\end{code}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \matrix [draw=red] (lhs)
+    {\vecf & \vect{a}{b} & \vect{x}{y} & \vecf & \vect{z}{y} \\};
+
+    \node [vecpatch-op, right=0 of lhs] {$\ggg$};
+
+    \matrix [draw=red, below=3mm of lhs] (rhs)
+    {\vecf & \vect{b}{c} & \vecf       & \vecf & \vect{y}{x} \\};
+
+    \node [vecpatch-op, left=0 of rhs] {$\ggg$};
+    \node [vecpatch-op, right=0 of rhs] {$=$};
+          
+    \matrix [draw=red, below=3mm of rhs] (res)
+    {\vecf & \vect{a}{c} & \vect{x}{y} & \vecf & \vect{z}{x} \\};
+          
+    \node [vecpatch-op, left=0 of res] {$=$};
+  \end{tikzpicture}
+  \caption{Конфликтующее объединение векторов}
+  \label{fig:vec-merge-conflict}
+\end{figure}
 
 \AgdaHide{
 \begin{code}%

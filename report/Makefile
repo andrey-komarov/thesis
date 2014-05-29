@@ -1,7 +1,7 @@
 
 LATEX=xelatex
 
-thesis.pdf: $(futuretex) thesis.tex chapters/*.tex thesis.bib agda.sty
+thesis.pdf: $(futuretex) thesis.tex chapters/*.tex thesis.bib agda.sty alltex
 	${LATEX} thesis
 	biber thesis
 	${LATEX} thesis
