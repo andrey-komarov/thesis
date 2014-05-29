@@ -74,7 +74,7 @@
 \begin{itemize}
 \item вектора фиксированной длины~(рисунок~\ref{fig:repotypes-vec});
 \item двоичные деревья с элементами в
-  вершинах~(рисунок~\ref{fig:repotypes-tree}).
+  листьях~(рисунок~\ref{fig:repotypes-tree}).
 \end{itemize}
 
 Для этих систем контроля версий и операций над ними были доказаны
@@ -95,17 +95,17 @@
   \begin{subfigure}[b]{0.45\textwidth}
     \centering
     \begin{tikzpicture}
-      \node[treev] {a}
-      child[treearr] {node[treev] {b}
-        child[treearr] {node[treev] {c}
+      \node[treev] {}
+      child[treearr] {node[treev] {}
+        child[treearr] {node[treev] {a}
         }
-        child[treearr] {node[treev] {d}
+        child[treearr] {node[treev] {b}
         }
       }
-      child[treearr] {node[treev] {e}
+      child[treearr] {node[treev] {c}
       };
     \end{tikzpicture}
-    \caption{Двоичное дерево с элементами в вершинах}
+    \caption{Двоичное дерево с элементами в листьях}
     \label{fig:repotypes-tree}
   \end{subfigure}
   \caption{Виды ревизий}
