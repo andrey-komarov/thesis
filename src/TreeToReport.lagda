@@ -566,67 +566,196 @@ p_3)$. Остальной мусор появляется из-за того, ч
 
 \subsection{Объединение конфликтующих патчей}
 
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    [level distance=1cm,outer sep=0]
+    \node[treev] (lhsr) {}
+    child[treearr] {node[treev] {}
+      child[treearr] {node[fill=yellow,rectangle,draw=black] {$E \to F$}
+      }
+      child[treearr] {node[fill=yellow,rectangle,draw=black,xshift=6mm] {$G \to H$}
+      }
+    }
+    child[treearr] {node[rectangle, minimum height=1cm] {}
+    };
+    \node[fit=(lhsr)(lhsr-1)(lhsr-1-1)(lhsr-1-2)(lhsr-2)] (lhs) {};
+
+    \node[right=-4mm of lhs,font=\huge] (and) {$\ggg$};
+
+    \node[treev, right=3.3cm of lhsr] (rhsr) {}
+    child[treearr] {node[treev] {}
+      child[treearr] {node[rectangle, minimum height=1cm] {}
+      }
+      child[treearr] {node[fill=yellow,rectangle,draw=black,xshift=-2mm] {$H \to I$}
+      }
+    }
+    child[treearr] {node[rectangle, minimum height=1cm] {}
+    };
+    \node[fit=(rhsr)(rhsr-1)(lhsr-2)] (rhs) {};
+
+    \node[right=3.4cm of lhs,font=\Huge] (eq) {$=$};
+
+    \node[treev, right=6.8cm of lhsr] {}
+    child[treearr] {node[treev] {}
+      child[treearr] {node[fill=yellow,rectangle,draw=black] {$E \to F$}
+      }
+      child[treearr] {node[fill=yellow,rectangle,draw=black,xshift=6mm] {$G \to I$}
+      }
+    }
+    child[treearr] {node[rectangle, minimum height=1cm] {}
+    };
+  \end{tikzpicture}
+  \caption{Конфликтующее объединение патчей}
+  \label{fig:tree-merge-conflict}
+\end{figure}
+
+Аналогично векторам, введём для пары патчей отношение <<можно
+применить последовательно>> \AgdaFunction{\_⋙?\_}, которое будет
+означать, что второй патч можно применить после первого и он помеяет
+только то, что менял первый.
+
+\begin{code}
+data _⋙?_ : {s₁ s₂ : Form} (p₁ : Patch s₁) (p₂ : Patch s₂) → Set where
+\end{code}
+
+Второй патч может ничего не делать.
+
+\begin{code}
+  ✶⋙?I : ∀ {s : Form} (p : Patch s) → p ⋙? I
+\end{code}
+
+Либо, сразу заменять результат замены первого на что-то новое.
+
+\begin{code}
+  Here-⋙? : ∀ (t₁ t₂ t₃ : Tree) → ⟨ t₁ ⇒ t₂ ⟩ ⋙? ⟨ t₂ ⇒ t₃ ⟩
+\end{code}
+
+Либо, собирать из поддеревьев.
+
+\begin{code}
+  Branch-⋙? : ∀ {s₁ s₂ s₃ s₄} 
+    → {p₁ : Patch s₁} {p₂ : Patch s₂} {p₃ : Patch s₃} {p₄ : Patch s₄}
+    → (L : p₁ ⋙? p₂) → (R : p₃ ⋙? p₄) → ⟨ p₁ ∧ p₃ ⟩ ⋙? ⟨ p₂ ∧ p₄ ⟩
+\end{code}
+    
+\AgdaHide{
+\begin{code}
+⋙?-uniq : ∀ {s₁ s₂ : Form} {p₁ : Patch s₁} {p₂ : Patch s₂}
+  → (?₁ ?₂ : p₁ ⋙? p₂) → ?₁ ≡ ?₂
+⋙?-uniq (✶⋙?I p₁) (✶⋙?I .p₁) = refl
+⋙?-uniq (Here-⋙? t₁ t₂ t₃) (Here-⋙? .t₁ .t₂ .t₃) = refl
+⋙?-uniq (Branch-⋙? ?₁ ?₂) (Branch-⋙? ?₃ ?₄) 
+  rewrite ⋙?-uniq ?₁ ?₃ | ⋙?-uniq ?₂ ?₄ = refl
+\end{code}
+}
+
+Определим, собственно, последовательное применение патчей.
+
+\begin{code}
+⋙ : {s₁ s₂ : Form} {p₁ : Patch s₁} {p₂ : Patch s₂}
+  → p₁ ⋙? p₂ → Patch s₁
+\end{code}
+
+Если второй патч ничего не делает, то результат~--- первый патч.
+
+\begin{code}
+⋙ (✶⋙?I p) = p
+\end{code}
+
+Если второй патч ломает то, что сделал первый~--- то результатом будет
+преобразование из того, что ожидал первый в то, что делает второй.
+
+\begin{code}
+⋙ (Here-⋙? t₁ t₂ t₃) = ⟨ t₁ ⇒ t₃ ⟩
+\end{code}
+
+Рекурсивно запуститься от поддеревьев.
+
+\begin{code}
+⋙ (Branch-⋙? p₁⋙?p₂ p₃⋙?p₄) = ⟨ ⋙ p₁⋙?p₂ ∧ ⋙ p₃⋙?p₄ ⟩
+\end{code}
+
+Докажем, что результат последовательного применения двух патчей
+не зависит от того, как именно доказано, что их можно последовательно 
+применить. Эта лемма понадобится в дальнейшем.
+
+\begin{code}
+⋙-preserves : ∀ {s₁ s₂ : Form} {p₁ : Patch s₁} {p₂ : Patch s₂}
+  → (?₁ ?₂ : p₁ ⋙? p₂) → ⋙ ?₁ ⟷ ⋙ ?₂
+\end{code}
 
 \AgdaHide{
 \begin{code}
-module ⋙-try2 where
-  data _⋙?_ : {s₁ s₂ : Form} (p₁ : Patch s₁) (p₂ : Patch s₂) → Set where
-    ✶⋙?I : ∀ {s : Form} (p : Patch s) → p ⋙? I
-    Here-⋙? : ∀ (t₁ t₂ t₃ : Tree) → ⟨ t₁ ⇒ t₂ ⟩ ⋙? ⟨ t₂ ⇒ t₃ ⟩
-    Branch-⋙? : ∀ {s₁ s₂ s₃ s₄} 
-      → {p₁ : Patch s₁} {p₂ : Patch s₂} {p₃ : Patch s₃} {p₄ : Patch s₄}
-      → (L : p₁ ⋙? p₂) → (R : p₃ ⋙? p₄) → ⟨ p₁ ∧ p₃ ⟩ ⋙? ⟨ p₂ ∧ p₄ ⟩
-      
-  ⋙?-uniq : ∀ {s₁ s₂ : Form} {p₁ : Patch s₁} {p₂ : Patch s₂}
-    → (?₁ ?₂ : p₁ ⋙? p₂) → ?₁ ≡ ?₂
-  ⋙?-uniq (✶⋙?I p₁) (✶⋙?I .p₁) = refl
-  ⋙?-uniq (Here-⋙? t₁ t₂ t₃) (Here-⋙? .t₁ .t₂ .t₃) = refl
-  ⋙?-uniq (Branch-⋙? ?₁ ?₂) (Branch-⋙? ?₃ ?₄) 
-    rewrite ⋙?-uniq ?₁ ?₃ | ⋙?-uniq ?₂ ?₄ = refl
-  
-  ⋙ : {s₁ s₂ : Form} {p₁ : Patch s₁} {p₂ : Patch s₂}
-    → p₁ ⋙? p₂ → Patch s₁
-  ⋙ (✶⋙?I p₁) = p₁
-  ⋙ (Here-⋙? t₁ t₂ t₃) = ⟨ t₁ ⇒ t₃ ⟩
-  ⋙ (Branch-⋙? p₁⋙?p₂ p₃⋙?p₄) = ⟨ ⋙ p₁⋙?p₂ ∧ ⋙ p₃⋙?p₄ ⟩
-  
-  ⋙-preserves : ∀ {s₁ s₂ : Form} {p₁ : Patch s₁} {p₂ : Patch s₂}
-    → (?₁ ?₂ : p₁ ⋙? p₂) → ⋙ ?₁ ⟷ ⋙ ?₂
-  ⋙-preserves (✶⋙?I p₁) (✶⋙?I .p₁) = ⟷-refl p₁
-  ⋙-preserves (Here-⋙? t₁ t₂ t₃) (Here-⋙? .t₁ .t₂ .t₃) = 
-    ⟷-refl ⟨ t₁ ⇒ t₃ ⟩
-  ⋙-preserves (Branch-⋙? ?₁ ?₂) (Branch-⋙? ?₃ ?₄) = 
-    ⟷-branch (⋙-preserves ?₁ ?₃) (⋙-preserves ?₂ ?₄)
+⋙-preserves (✶⋙?I p₁) (✶⋙?I .p₁) = ⟷-refl p₁
+⋙-preserves (Here-⋙? t₁ t₂ t₃) (Here-⋙? .t₁ .t₂ .t₃) = 
+  ⟷-refl ⟨ t₁ ⇒ t₃ ⟩
+⋙-preserves (Branch-⋙? ?₁ ?₂) (Branch-⋙? ?₃ ?₄) = 
+  ⟷-branch (⋙-preserves ?₁ ?₃) (⋙-preserves ?₂ ?₄)
+\end{code}
+}
 
-  ⋙-assoc : ∀ {s₁ s₂ s₃ : Form} {p₁ : Patch s₁} {p₂ : Patch s₂} {p₃ : Patch s₃}
-    → (1⋙?2 : p₁ ⋙? p₂)
-    → ([1⋙2]⋙?3 : (⋙ 1⋙?2) ⋙? p₃)
-    → (2⋙?3 : p₂ ⋙? p₃)
-    → (1⋙?[2⋙3] : p₁ ⋙? (⋙ 2⋙?3))
-    → (⋙ [1⋙2]⋙?3) ⟷ (⋙ 1⋙?[2⋙3])
-  ⋙-assoc (✶⋙?I p₁) (✶⋙?I .p₁) (✶⋙?I .I) (✶⋙?I .p₁) = ⟷-refl p₁
-  ⋙-assoc (Here-⋙? t₁ t₂ t₃) (✶⋙?I .(⟨ t₁ ⇒ t₃ ⟩)) (✶⋙?I .(⟨ t₂ ⇒ t₃ ⟩)) (Here-⋙? .t₁ .t₂ .t₃) = ⟷-refl ⟨ t₁ ⇒ t₃ ⟩
-  ⋙-assoc (Here-⋙? t₁ t₂ t₃) (Here-⋙? .t₁ .t₃ t₄) (Here-⋙? .t₂ .t₃ .t₄) (Here-⋙? .t₁ .t₂ .t₄) = ⟷-refl ⟨ t₁ ⇒ t₄ ⟩
-  ⋙-assoc 
-    (Branch-⋙? 1⋙?2 3⋙?4) 
-    (✶⋙?I .(⟨ ⋙ 1⋙?2 ∧ ⋙ 3⋙?4 ⟩)) 
-    (✶⋙?I ._) 
-    (Branch-⋙? 1⋙?[2⋙0] 3⋙?[4⋙0]) 
-    = ⟷-branch (⋙-preserves 1⋙?2 1⋙?[2⋙0]) 
-      (⋙-preserves 3⋙?4 3⋙?[4⋙0])
-  ⋙-assoc 
-    (Branch-⋙? 1⋙?2 3⋙?4) 
-    (Branch-⋙? [1⋙2]⋙?5 [3⋙4]⋙?6) 
-    (Branch-⋙? 2⋙?5 4⋙?6) 
-    (Branch-⋙? 1⋙?[2⋙5] 3⋙?[4⋙6]) 
-    = ⟷-branch 
-      (⋙-assoc 1⋙?2 [1⋙2]⋙?5 2⋙?5 1⋙?[2⋙5]) 
-      (⋙-assoc 3⋙?4 [3⋙4]⋙?6 4⋙?6 3⋙?[4⋙6])
+Докажем ассоциативность операции \AgdaFunction{⋙}. При доказательстве
+в одном из нетривиальных случаев потребовалась лемма
+\AgdaFunction{⋙-preserves}, а в другом~--- рекурсивный вызов от
+поддеревьев.
 
-open ⋙-try2
+\begin{code}
+⋙-assoc : ∀ {s₁ s₂ s₃ : Form} {p₁ : Patch s₁} {p₂ : Patch s₂} {p₃ : Patch s₃}
+  → (1⋙?2 : p₁ ⋙? p₂)
+  → ([1⋙2]⋙?3 : (⋙ 1⋙?2) ⋙? p₃)
+  → (2⋙?3 : p₂ ⋙? p₃)
+  → (1⋙?[2⋙3] : p₁ ⋙? (⋙ 2⋙?3))
+  → (⋙ [1⋙2]⋙?3) ⟷ (⋙ 1⋙?[2⋙3])
 \end{code}
 
---\begin{code}
+\AgdaHide{
+\begin{code}
+⋙-assoc (✶⋙?I p₁) (✶⋙?I .p₁) (✶⋙?I .I) (✶⋙?I .p₁) = ⟷-refl p₁
+⋙-assoc (Here-⋙? t₁ t₂ t₃) (✶⋙?I .(⟨ t₁ ⇒ t₃ ⟩)) (✶⋙?I .(⟨ t₂ ⇒ t₃ ⟩)) (Here-⋙? .t₁ .t₂ .t₃) = ⟷-refl ⟨ t₁ ⇒ t₃ ⟩
+⋙-assoc (Here-⋙? t₁ t₂ t₃) (Here-⋙? .t₁ .t₃ t₄) (Here-⋙? .t₂ .t₃ .t₄) (Here-⋙? .t₁ .t₂ .t₄) = ⟷-refl ⟨ t₁ ⇒ t₄ ⟩
+⋙-assoc 
+  (Branch-⋙? 1⋙?2 3⋙?4) 
+  (✶⋙?I .(⟨ ⋙ 1⋙?2 ∧ ⋙ 3⋙?4 ⟩)) 
+  (✶⋙?I ._) 
+  (Branch-⋙? 1⋙?[2⋙0] 3⋙?[4⋙0]) 
+  = ⟷-branch (⋙-preserves 1⋙?2 1⋙?[2⋙0]) 
+    (⋙-preserves 3⋙?4 3⋙?[4⋙0])
+⋙-assoc 
+  (Branch-⋙? 1⋙?2 3⋙?4) 
+  (Branch-⋙? [1⋙2]⋙?5 [3⋙4]⋙?6) 
+  (Branch-⋙? 2⋙?5 4⋙?6) 
+  (Branch-⋙? 1⋙?[2⋙5] 3⋙?[4⋙6]) 
+  = ⟷-branch 
+    (⋙-assoc 1⋙?2 [1⋙2]⋙?5 2⋙?5 1⋙?[2⋙5]) 
+    (⋙-assoc 3⋙?4 [3⋙4]⋙?6 4⋙?6 3⋙?[4⋙6])
+\end{code}
+}
+
+В качестве более продвинутого варианта для последовательного 
+применения рассматривалось следующее определение.
+
+\begin{code}
+module ⋙-try1 where
+  data _⋙??_ : {s₁ s₂ : Form} (p₁ : Patch s₁) (p₂ : Patch s₂) → Set where
+    ✶⋙?I : ∀ {s : Form} (p : Patch s) → p ⋙?? I
+    Here-⋙? : ∀ (t₁ t₂ t₃ : Tree) → ⟨ t₁ ⇒ t₂ ⟩ ⋙?? ⟨ t₂ ⇒ t₃ ⟩
+    There-⋙? : ∀ {s₁ s₂ : Form} {t₁ t₂ : Tree} {p₁ : Patch s₁} {p₂ : Patch s₂}
+      → (t : Tree) → p₁ ⊏ t₁ → p₂ ⊏ t₂ 
+      → ⟨ t ⇒ Branch t₁ t₂ ⟩ ⋙?? ⟨ p₁ ∧ p₂ ⟩
+    Branch-⋙? : ∀ {s₁ s₂ s₃ s₄} 
+      → {p₁ : Patch s₁} {p₂ : Patch s₂} {p₃ : Patch s₃} {p₄ : Patch s₄}
+      → (L : p₁ ⋙?? p₂) → (R : p₃ ⋙?? p₄) → ⟨ p₁ ∧ p₃ ⟩ ⋙?? ⟨ p₂ ∧ p₄ ⟩
+\end{code}
+
+Отличие от прошлого в том, что появилась опция второму патчу не менять
+\emph{сразу} то, что сделал первый, а поменять где-то в глубине
+дерева. Однако, в данном варианте оказалось, что доказать некоторые
+свойства проблематично и они кажутся не верными. Поэтому, решено
+было остановиться на более простом варианте.
+
+\AgdaHide{
+\begin{code}
 --patch-lem : ∀ {s₁ s₂ : Form} 
 --  → (x : Tree) → (p : s₁ ∥ s₂)
 --  → (p₁ : Patch s₁) → (p₂ : Patch s₂)
@@ -653,8 +782,10 @@ open ⋙-try2
 --patch-⊏-indep ⟨ .t ⇒ to ⟩ t (⊏-⇒ .t .to) (⊏-⇒ .t .to) = refl
 --patch-⊏-indep (⟨_∧_⟩ {sl}{sr} pl pr) .(Branch tl tr) (⊏-∧ {.sl} {.sr} {.pl} {.pr} {tl} {tr} ⊏₁ ⊏₂) (⊏-∧ ⊏₃ ⊏₄) 
 --  rewrite patch-⊏-indep pl tl ⊏₁ ⊏₃ | patch-⊏-indep pr tr ⊏₂ ⊏₄ = refl
---\end{code}
+\end{code}
+}
   
+\AgdaHide{
 \begin{code}
 -- Неправда
 --unite-lem : {s₁ s₂ : Form} → (∥₁ ∥₂ : s₁ ∥ s₂) → ∥₁ ≡ ∥₂
@@ -781,5 +912,5 @@ module asfddsfdsf where
 
 \end{code}
 
-
 }
+
