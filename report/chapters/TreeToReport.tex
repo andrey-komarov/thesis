@@ -361,9 +361,13 @@
   
 \subsection{Эквивалентность патчей}
 
+Будем называть два патча эквивалентными, если области определения у
+них совпадают и на этой общей области определения их применение даёт
+один и тот же результат. Прежде чем вводить, Непосредственно,
+Эквивалентность, введём отношение, которое можно назвать \emph{не
+хуже, чем}:
+
 \begin{code}%
-\>\<%
-\\
 \>\AgdaFunction{\_⟶\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{s₁} \AgdaBound{s₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
@@ -377,9 +381,17 @@
 \\
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaSymbol{(}\AgdaFunction{patch} \AgdaBound{p₁} \AgdaBound{x} \AgdaBound{p₁-x} \AgdaDatatype{≡} \AgdaFunction{patch} \AgdaBound{p₂} \AgdaBound{x} \AgdaBound{p₂-x}\AgdaSymbol{))}\<%
-\\
-%
-\\
+\end{code}
+
+\AgdaBound{p₁} \AgdaFunction{⋀} \AgdaBound{p₂}: область определения
+\AgdaBound{p₂} является надмножеством области определения
+\AgdaBound{p₂} и на общей области определения результаты применения
+патча совпадают.
+
+Определим эквивалентность как взаимовложенность областей определения
+и равенство на общей области опеределения.
+
+\begin{code}%
 \>\AgdaFunction{\_⟷\_} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{\}}\<%
 \\
 \>[0]\AgdaIndent{2}{}\<[2]%
