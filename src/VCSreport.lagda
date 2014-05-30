@@ -6,7 +6,7 @@ module VCSreport where
 
 open import OXIj.BrutalDepTypes
 
-module With-⋀-and-⋙ (A : Set) where
+module With-⋀-and-⋙ (A : Set) (eqA : (a b : A) → Dec (a ≡ b)) where
 
   open Data-Vec
   open ≡-Prop
@@ -610,3 +610,55 @@ TODO неправильное определение ⟷.
 \end{code}
 }
 
+\AgdaHide{
+\begin{code}
+  drop : ∀ {n} (b₁ b₂ : Bool) (f₁ f₂ : Form n)
+    → (b₁ ∷ f₁) ∥ (b₂ ∷ f₂) → f₁ ∥ f₂
+  drop .false .false f₃ f₄ (⊥∥⊥ p) = p
+  drop .true .false f₃ f₄ (⊤∥⊥ p) = p
+  drop .false .true f₃ f₄ (⊥∥⊤ p) = p
+
+  ∥-dec : ∀ {n} (f₁ f₂ : Form n) → Dec (f₁ ∥ f₂)
+  ∥-dec [] [] = yes []∥[]
+  ∥-dec (true ∷ f₁) (true ∷ f₂) = no (no-tt f₁ f₂) where
+    no-tt : ∀ {n} (f₁ f₂ : Form n) → ¬ ((true ∷ f₁) ∥ (true ∷ f₂))
+    no-tt _ _ ()
+  ∥-dec (true ∷ f₁) (false ∷ f₂) with ∥-dec f₁ f₂
+  ... | yes a = yes (⊤∥⊥ a)
+  ... | no ¬a = no (¬a ∘ drop true false f₁ f₂) where
+  ∥-dec (false ∷ f₁) (true ∷ f₂) with ∥-dec f₁ f₂
+  ... | yes a = yes (⊥∥⊤ a)
+  ... | no ¬a = no (¬a ∘ drop false true f₁ f₂)
+  ∥-dec (false ∷ f₁) (false ∷ f₂) with ∥-dec f₁ f₂
+  ... | yes a = yes (⊥∥⊥ a)
+  ... | no ¬a = no (¬a ∘ drop false false f₁ f₂)
+  
+  ⋙?-dec : ∀ {n} {f₁ f₂ : Form n} (p₁ : Patch f₁) (p₂ : Patch f₂)
+    → Dec (p₁ ⋙? p₂)
+  ⋙?-dec O O = yes O⋙?O
+  ⋙?-dec (⊥∷ p₁) (⊥∷ p₂) with ⋙?-dec p₁ p₂ 
+  ... | yes a = yes (⊥⋙?⊥ a)
+  ... | no ¬a = no (¬a ∘ ⊥⊥-drop) where
+    ⊥⊥-drop : ⊥∷ p₁ ⋙? ⊥∷ p₂ → p₁ ⋙? p₂
+    ⊥⊥-drop (⊥⋙?⊥ p) = p
+  ⋙?-dec (⊥∷ p₁) (⟨ from ⇒ to ⟩∷ p₂) = no fail where
+    fail : ⊥∷ p₁ ⋙? (⟨ from ⇒ to ⟩∷ p₂) → ⊥
+    fail ()
+  ⋙?-dec (⟨ from ⇒ to ⟩∷ p₁) (⊥∷ p₂) with ⋙?-dec p₁ p₂
+  ... | yes a = yes (⊤⋙?⊥ from to a)
+  ... | no ¬a = no (¬a ∘ ⊤⊥-drop) where
+    ⊤⊥-drop : ∀ {a b : A} → (⟨ a ⇒ b ⟩∷ p₁) ⋙? ⊥∷ p₂ → p₁ ⋙? p₂
+    ⊤⊥-drop (⊤⋙?⊥ _ _ p) = p
+  ⋙?-dec (⟨ from₁ ⇒ to₁ ⟩∷ p₁) (⟨ from₂ ⇒ to₂ ⟩∷ p₂) with ⋙?-dec p₁ p₂
+  ... | yes a = cmp (eqA to₁ from₂) where
+    cmp : Dec (to₁ ≡ from₂) 
+      → Dec ((⟨ from₁ ⇒ to₁ ⟩∷ p₁) ⋙? (⟨ from₂ ⇒ to₂ ⟩∷ p₂))
+    cmp (yes aa) rewrite aa = yes (⊤⋙?⊤ from₁ from₂ to₂ a)
+    cmp (no ¬a) = no (¬a ∘ ends-eq) where
+      ends-eq : ∀ {a b c d : A} → (⟨ a ⇒ b ⟩∷ p₁) ⋙? (⟨ c ⇒ d ⟩∷ p₂) → b ≡ c
+      ends-eq (⊤⋙?⊤ a c d p) = refl
+  ... | no ¬a = no (¬a ∘ ⊤⊤-drop) where
+    ⊤⊤-drop : ∀ {a b c d} → (⟨ a ⇒ b ⟩∷ p₁) ⋙? (⟨ c ⇒ d ⟩∷ p₂) → p₁ ⋙? p₂
+    ⊤⊤-drop (⊤⋙?⊤ _ _ _ p) = p
+\end{code}
+}
