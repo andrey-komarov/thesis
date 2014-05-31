@@ -10,7 +10,7 @@
 \\
 %
 \\
-\>\AgdaKeyword{module} \AgdaModule{With-⋀-and-⋙} \AgdaSymbol{(}\AgdaBound{A} \AgdaSymbol{:} \AgdaPrimitiveType{Set}\AgdaSymbol{)} \AgdaKeyword{where}\<%
+\>\AgdaKeyword{module} \AgdaModule{With-⋀-and-⋙} \AgdaSymbol{(}\AgdaBound{A} \AgdaSymbol{:} \AgdaPrimitiveType{Set}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{eqA} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{a} \AgdaBound{b} \AgdaSymbol{:} \AgdaBound{A}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Dec} \AgdaSymbol{(}\AgdaBound{a} \AgdaDatatype{≡} \AgdaBound{b}\AgdaSymbol{))} \AgdaKeyword{where}\<%
 \\
 %
 \\
@@ -1033,3 +1033,151 @@ TODO неправильное определение ⟷.
 \end{code}
 }
 
+\AgdaHide{
+\begin{code}%
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{drop} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{b₁} \AgdaBound{b₂} \AgdaSymbol{:} \AgdaDatatype{Bool}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{)}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaSymbol{→} \AgdaSymbol{(}\AgdaBound{b₁} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaDatatype{∥} \AgdaSymbol{(}\AgdaBound{b₂} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{drop} \AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaBound{f₃} \AgdaBound{f₄} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊥} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaBound{p}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{drop} \AgdaSymbol{.}\AgdaInductiveConstructor{true} \AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaBound{f₃} \AgdaBound{f₄} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤∥⊥} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaBound{p}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{drop} \AgdaSymbol{.}\AgdaInductiveConstructor{false} \AgdaSymbol{.}\AgdaInductiveConstructor{true} \AgdaBound{f₃} \AgdaBound{f₄} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊤} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaBound{p}\<%
+\\
+%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{∥-dec} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Dec} \AgdaSymbol{(}\AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{∥-dec} \AgdaInductiveConstructor{[]} \AgdaInductiveConstructor{[]} \AgdaSymbol{=} \AgdaInductiveConstructor{yes} \AgdaInductiveConstructor{[]∥[]}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{∥-dec} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{no} \AgdaSymbol{(}\AgdaFunction{no-tt} \AgdaBound{f₁} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaKeyword{where}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{no-tt} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaFunction{¬} \AgdaSymbol{((}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaDatatype{∥} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{))}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{no-tt} \AgdaSymbol{\_} \AgdaSymbol{\_} \AgdaSymbol{()}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{∥-dec} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaKeyword{with} \AgdaFunction{∥-dec} \AgdaBound{f₁} \AgdaBound{f₂}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{yes} \AgdaBound{a} \AgdaSymbol{=} \AgdaInductiveConstructor{yes} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤∥⊥} \AgdaBound{a}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{no} \AgdaBound{¬a} \AgdaSymbol{=} \AgdaInductiveConstructor{no} \AgdaSymbol{(}\AgdaBound{¬a} \AgdaFunction{∘} \AgdaFunction{drop} \AgdaInductiveConstructor{true} \AgdaInductiveConstructor{false} \AgdaBound{f₁} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaKeyword{where}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{∥-dec} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaKeyword{with} \AgdaFunction{∥-dec} \AgdaBound{f₁} \AgdaBound{f₂}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{yes} \AgdaBound{a} \AgdaSymbol{=} \AgdaInductiveConstructor{yes} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊤} \AgdaBound{a}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{no} \AgdaBound{¬a} \AgdaSymbol{=} \AgdaInductiveConstructor{no} \AgdaSymbol{(}\AgdaBound{¬a} \AgdaFunction{∘} \AgdaFunction{drop} \AgdaInductiveConstructor{false} \AgdaInductiveConstructor{true} \AgdaBound{f₁} \AgdaBound{f₂}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{∥-dec} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)} \AgdaKeyword{with} \AgdaFunction{∥-dec} \AgdaBound{f₁} \AgdaBound{f₂}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{yes} \AgdaBound{a} \AgdaSymbol{=} \AgdaInductiveConstructor{yes} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∥⊥} \AgdaBound{a}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{no} \AgdaBound{¬a} \AgdaSymbol{=} \AgdaInductiveConstructor{no} \AgdaSymbol{(}\AgdaBound{¬a} \AgdaFunction{∘} \AgdaFunction{drop} \AgdaInductiveConstructor{false} \AgdaInductiveConstructor{false} \AgdaBound{f₁} \AgdaBound{f₂}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{⋙?-dec} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaBound{p₂} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaBound{f₂}\AgdaSymbol{)}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaSymbol{→} \AgdaDatatype{Dec} \AgdaSymbol{(}\AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{⋙?-dec} \AgdaInductiveConstructor{O} \AgdaInductiveConstructor{O} \AgdaSymbol{=} \AgdaInductiveConstructor{yes} \AgdaInductiveConstructor{O⋙?O}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{⋙?-dec} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaKeyword{with} \AgdaFunction{⋙?-dec} \AgdaBound{p₁} \AgdaBound{p₂} \<[43]%
+\>[43]\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{yes} \AgdaBound{a} \AgdaSymbol{=} \AgdaInductiveConstructor{yes} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥⋙?⊥} \AgdaBound{a}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{no} \AgdaBound{¬a} \AgdaSymbol{=} \AgdaInductiveConstructor{no} \AgdaSymbol{(}\AgdaBound{¬a} \AgdaFunction{∘} \AgdaFunction{⊥⊥-drop}\AgdaSymbol{)} \AgdaKeyword{where}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{⊥⊥-drop} \AgdaSymbol{:} \AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂} \AgdaSymbol{→} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{⊥⊥-drop} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥⋙?⊥} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaBound{p}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{⋙?-dec} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{no} \AgdaFunction{fail} \AgdaKeyword{where}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{fail} \AgdaSymbol{:} \AgdaInductiveConstructor{⊥∷} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{⊥}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{fail} \AgdaSymbol{()}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{⋙?-dec} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from} \AgdaInductiveConstructor{⇒} \AgdaBound{to} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaKeyword{with} \AgdaFunction{⋙?-dec} \AgdaBound{p₁} \AgdaBound{p₂}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{yes} \AgdaBound{a} \AgdaSymbol{=} \AgdaInductiveConstructor{yes} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤⋙?⊥} \AgdaBound{from} \AgdaBound{to} \AgdaBound{a}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{no} \AgdaBound{¬a} \AgdaSymbol{=} \AgdaInductiveConstructor{no} \AgdaSymbol{(}\AgdaBound{¬a} \AgdaFunction{∘} \AgdaFunction{⊤⊥-drop}\AgdaSymbol{)} \AgdaKeyword{where}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{⊤⊥-drop} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{a} \AgdaBound{b} \AgdaSymbol{:} \AgdaBound{A}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{b} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaDatatype{⋙?} \AgdaInductiveConstructor{⊥∷} \AgdaBound{p₂} \AgdaSymbol{→} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{⊤⊥-drop} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤⋙?⊥} \AgdaSymbol{\_} \AgdaSymbol{\_} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaBound{p}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaFunction{⋙?-dec} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from₁} \AgdaInductiveConstructor{⇒} \AgdaBound{to₁} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from₂} \AgdaInductiveConstructor{⇒} \AgdaBound{to₂} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaKeyword{with} \AgdaFunction{⋙?-dec} \AgdaBound{p₁} \AgdaBound{p₂}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{yes} \AgdaBound{a} \AgdaSymbol{=} \AgdaFunction{cmp} \AgdaSymbol{(}\AgdaBound{eqA} \AgdaBound{to₁} \AgdaBound{from₂}\AgdaSymbol{)} \AgdaKeyword{where}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{cmp} \AgdaSymbol{:} \AgdaDatatype{Dec} \AgdaSymbol{(}\AgdaBound{to₁} \AgdaDatatype{≡} \AgdaBound{from₂}\AgdaSymbol{)} \<[28]%
+\>[28]\<%
+\\
+\>[4]\AgdaIndent{6}{}\<[6]%
+\>[6]\AgdaSymbol{→} \AgdaDatatype{Dec} \AgdaSymbol{((}\AgdaInductiveConstructor{⟨} \AgdaBound{from₁} \AgdaInductiveConstructor{⇒} \AgdaBound{to₁} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{from₂} \AgdaInductiveConstructor{⇒} \AgdaBound{to₂} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{))}\<%
+\\
+\>[0]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{cmp} \AgdaSymbol{(}\AgdaInductiveConstructor{yes} \AgdaBound{aa}\AgdaSymbol{)} \AgdaKeyword{rewrite} \AgdaBound{aa} \AgdaSymbol{=} \AgdaInductiveConstructor{yes} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤⋙?⊤} \AgdaBound{from₁} \AgdaBound{from₂} \AgdaBound{to₂} \AgdaBound{a}\AgdaSymbol{)}\<%
+\\
+\>[0]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{cmp} \AgdaSymbol{(}\AgdaInductiveConstructor{no} \AgdaBound{¬a}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{no} \AgdaSymbol{(}\AgdaBound{¬a} \AgdaFunction{∘} \AgdaFunction{ends-eq}\AgdaSymbol{)} \AgdaKeyword{where}\<%
+\\
+\>[4]\AgdaIndent{6}{}\<[6]%
+\>[6]\AgdaFunction{ends-eq} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{a} \AgdaBound{b} \AgdaBound{c} \AgdaBound{d} \AgdaSymbol{:} \AgdaBound{A}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{b} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{c} \AgdaInductiveConstructor{⇒} \AgdaBound{d} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{b} \AgdaDatatype{≡} \AgdaBound{c}\<%
+\\
+\>[4]\AgdaIndent{6}{}\<[6]%
+\>[6]\AgdaFunction{ends-eq} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤⋙?⊤} \AgdaBound{a} \AgdaBound{c} \AgdaBound{d} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaInductiveConstructor{refl}\<%
+\\
+\>[0]\AgdaIndent{2}{}\<[2]%
+\>[2]\AgdaSymbol{...} \AgdaSymbol{|} \AgdaInductiveConstructor{no} \AgdaBound{¬a} \AgdaSymbol{=} \AgdaInductiveConstructor{no} \AgdaSymbol{(}\AgdaBound{¬a} \AgdaFunction{∘} \AgdaFunction{⊤⊤-drop}\AgdaSymbol{)} \AgdaKeyword{where}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{⊤⊤-drop} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{a} \AgdaBound{b} \AgdaBound{c} \AgdaBound{d}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{a} \AgdaInductiveConstructor{⇒} \AgdaBound{b} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₁}\AgdaSymbol{)} \AgdaDatatype{⋙?} \AgdaSymbol{(}\AgdaInductiveConstructor{⟨} \AgdaBound{c} \AgdaInductiveConstructor{⇒} \AgdaBound{d} \AgdaInductiveConstructor{⟩∷} \AgdaBound{p₂}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaBound{p₁} \AgdaDatatype{⋙?} \AgdaBound{p₂}\<%
+\\
+\>[2]\AgdaIndent{4}{}\<[4]%
+\>[4]\AgdaFunction{⊤⊤-drop} \AgdaSymbol{(}\AgdaInductiveConstructor{⊤⋙?⊤} \AgdaSymbol{\_} \AgdaSymbol{\_} \AgdaSymbol{\_} \AgdaBound{p}\AgdaSymbol{)} \AgdaSymbol{=} \AgdaBound{p}\<%
+\end{code}
+}
