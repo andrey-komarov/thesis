@@ -4,15 +4,12 @@
     \wedge p$
   \item Ассоциативность $\wedge$: $(p \wedge q) \wedge r
     \longleftrightarrow p \wedge (q \wedge r)$
-    \begin{itemize}
-    \item Абелева группа
-    \end{itemize}
   \item Ассоциативность $\ggg$: $(p \ggg q) \ggg r \longleftrightarrow
     p \ggg (q \ggg r)$
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Свойства операций}
+\begin{frame}[fragile]{Свойства операций}
   \begin{itemize}
   \item Что-то, издалека похожее на дистрибутивность $\wedge$ и $\ggg$:
     \begin{itemize}
@@ -20,7 +17,10 @@
     \item Тогда $(a \wedge b) \ggg c \longleftrightarrow (a \ggg c')
       \wedge (b \ggg c'') $
     \end{itemize}
+  \item Объяснение: если был merge и патч после него, то (иногда)
+    можно разбить патч пополам и применить половинки в ветках мёржа.
   \end{itemize}
   
-TODO АДОВУЮ КАРТИНКУ, пока не понимаю, как нарисовать её понятно
+  %% ну нафиг эту картинку, смысла нет
+  
 \end{frame}

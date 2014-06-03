@@ -263,7 +263,8 @@ module With-⋀-and-⋙ (A : Set) (eqA : (a b : A) → Dec (a ≡ b)) where
 \end{code}
 }
 
-TODO неправильное определение ⟷.
+% TODO неправильное определение ⟷.
+%% done в дереве
 
 \subsection{Объединение неконфликтующих патчей}
 
