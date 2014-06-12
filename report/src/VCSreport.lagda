@@ -213,7 +213,8 @@ module With-⋀-and-⋙ (A : Set) (eqA : (a b : A) → Dec (a ≡ b)) where
       (⊥⋙?⊥ a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊥⋙?⊥ b⋙c'') = 
       (⟶-prepend-⊥⊥ (fst p)) , (⟶-prepend-⊥⊥ (snd p)) where
       p = ∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙c''
-    ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⊥∷ a) (⟨ from ⇒ to ⟩∷ b) (⊥∥⊥ c'∥c'') (⊥∥⊤ a∥b) 
+    ∧-⋙-lem (⊥∷ c') (⊥∷ c'') (⊥∷ a) 
+      (⟨ from ⇒ to ⟩∷ b) (⊥∥⊥ c'∥c'') (⊥∥⊤ a∥b) 
       (⊤⋙?⊥ .from .to a∧b⋙?c) (⊥⋙?⊥ a⋙?c') (⊤⋙?⊥ .from .to b⋙c'') = 
       (⟶-prepend-⊤⊤ from to (fst p)) , (⟶-prepend-⊤⊤ from to (snd p)) where
       p = ∧-⋙-lem c' c'' a b c'∥c'' a∥b a∧b⋙?c a⋙?c' b⋙c''
@@ -240,8 +241,10 @@ module With-⋀-and-⋙ (A : Set) (eqA : (a b : A) → Dec (a ≡ b)) where
       → (((p₁ ⋙ₚ p₂) p₁>>?p₂) ⋙ₚ p₃) [p₁>>ₚp₂]>>?p₃
         ⟷
         (p₁ ⋙ₚ (p₂ ⋙ₚ p₃) p₂>>?p₃) p₁>>?[p₂>>ₚp₃]
-    ⋙-assoc O⋙?O O⋙?O O⋙?O O⋙?O = (λ x x₁ → x₁ , refl) , (λ x x₁ → x₁ , refl)
-    ⋙-assoc (⊥⋙?⊥ p₁⋙?p₂) (⊥⋙?⊥ [p₁⋙p₂]⋙?p₃) (⊥⋙?⊥ p₂⋙?p₃) (⊥⋙?⊥ p₁⋙?[p₂⋙p₃]) = 
+    ⋙-assoc O⋙?O O⋙?O O⋙?O O⋙?O = 
+      (λ x x₁ → x₁ , refl) , (λ x x₁ → x₁ , refl)
+    ⋙-assoc (⊥⋙?⊥ p₁⋙?p₂) (⊥⋙?⊥ [p₁⋙p₂]⋙?p₃) 
+      (⊥⋙?⊥ p₂⋙?p₃) (⊥⋙?⊥ p₁⋙?[p₂⋙p₃]) = 
       (⟶-prepend-⊥⊥ (fst p)) , (⟶-prepend-⊥⊥ (snd p)) where
       p = ⋙-assoc p₁⋙?p₂ [p₁⋙p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙p₃]
     ⋙-assoc (⊤⋙?⊥ from to p₁⋙?p₂) (⊤⋙?⊥ .from .to [p₁⋙p₂]⋙?p₃) 
@@ -252,7 +255,8 @@ module With-⋀-and-⋙ (A : Set) (eqA : (a b : A) → Dec (a ≡ b)) where
       (⊤⋙?⊥ .to .to₂ p₂⋙?p₃) (⊤⋙?⊤ .from .to .to₂ p₁⋙?[p₂⋙p₃]) = 
       (⟶-prepend-⊤⊤ from to₂ (fst p)) , ⟶-prepend-⊤⊤ from to₂ (snd p) where
       p = ⋙-assoc p₁⋙?p₂ [p₁⋙p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙p₃]
-    ⋙-assoc (⊤⋙?⊤ from to to₂ p₁⋙?p₂) (⊤⋙?⊤ .from .to₂ to₃ [p₁⋙p₂]⋙?p₃) 
+    ⋙-assoc (⊤⋙?⊤ from to to₂ p₁⋙?p₂) 
+      (⊤⋙?⊤ .from .to₂ to₃ [p₁⋙p₂]⋙?p₃) 
       (⊤⋙?⊤ .to .to₂ .to₃ p₂⋙?p₃) (⊤⋙?⊤ .from .to .to₃ p₁⋙?[p₂⋙p₃]) = 
       (⟶-prepend-⊤⊤ from to₃ (fst p)) , ⟶-prepend-⊤⊤ from to₃ (snd p) where
       p = ⋙-assoc p₁⋙?p₂ [p₁⋙p₂]⋙?p₃ p₂⋙?p₃ p₁⋙?[p₂⋙p₃]

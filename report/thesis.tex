@@ -27,6 +27,11 @@
 \usepackage{epigraph}
 \usepackage{agda}
 
+\usepackage[toc,page]{appendix}
+\renewcommand{\appendixtocname}{Приложения}
+\renewcommand{\appendixpagename}{Приложения}
+\renewcommand{\appendixname}{Приложение}
+
 \usepackage{tikz}
 \usetikzlibrary{arrows,positioning,shapes}
 \tikzset{context/.style={circle, draw=black, minimum size=1cm}}
@@ -148,9 +153,15 @@
 \input{chapters/intro.tex}
 \input{chapters/chapter1.tex}
 \input{chapters/chapter2.tex}
-%\input{chapters/chapter3.tex}
 \input{chapters/outro.tex}
 
 \printbibliography
+
+\begin{appendices}
+  \renewcommand{\thechapter}{\arabic{chapter}}
+ \renewcommand{\chaptername}{Приложение}
+  \input{chapters/0A-source.tex}
+\end{appendices}
+
 
 \end{document}

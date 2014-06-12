@@ -204,8 +204,8 @@ lemma-∥-unite (Branch-∥ L1∥L2 R1∥R2) (Branch-∥ s₂∥s₃ s₂∥s₄
     | ∥-sym (∥-sym s₂∥s₄) | ∥-sym²≡id s₂∥s₄
 ... | .s₁∥s₃ | refl | .s₂∥s₄ | refl = 
   ⟷-refl ⟨ (p₁ ⋀ p₃) s₁∥s₃ ∧ (p₂ ⋀ p₄) s₂∥s₄ ⟩
-⋀-assoc (Branch-∥ L1∥L2 R1∥R2) (Branch-∥ L2∥L3 R2∥R3) (Branch-∥ L1∥L3 R1∥R3) 
-  ⟨ p₁ ∧ p₂ ⟩ ⟨ p₃ ∧ p₄ ⟩ ⟨ p₅ ∧ p₆ ⟩ = 
+⋀-assoc (Branch-∥ L1∥L2 R1∥R2) (Branch-∥ L2∥L3 R2∥R3) 
+  (Branch-∥ L1∥L3 R1∥R3) ⟨ p₁ ∧ p₂ ⟩ ⟨ p₃ ∧ p₄ ⟩ ⟨ p₅ ∧ p₆ ⟩ = 
     ⟷-branch 
       (⋀-assoc L1∥L2 L2∥L3 L1∥L3 p₁ p₃ p₅) 
       (⋀-assoc R1∥R2 R2∥R3 R1∥R3 p₂ p₄ p₆)
