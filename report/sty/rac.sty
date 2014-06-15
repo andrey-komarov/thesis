@@ -432,7 +432,7 @@
 }
 
 \def\startappendices{\par
- \def\thechapter{\Alph{chapter}}
+% \def\thechapter{\Alph{chapter}}
  \def\thesection{\thechapter.\arabic{section}}
 
  \ifx \selectfont\undefined
@@ -453,15 +453,15 @@
  \let\chapter=\startanappendix
  \setcounter{chapter}{0}
  \setcounter{section}{0}
- \def\@chapapp{APPENDIX}
+ \def\@chapapp{\kw@APPENDIX}
  \def\tocname{loa}
  \pagestyle{plain}
  \clearpage
  \thispagestyle{chappage}
- \addcontentsline{toc}{chapter}{APPENDICES}
+ \addcontentsline{toc}{chapter}{\kw@APPENDICESLIST}
  \hbox{ }
  \vfill
- \centerline{\large\bf APPENDICES}
+ \centerline{\large\bf \kw@APPENDICESLIST}
  \vfill
 }
 

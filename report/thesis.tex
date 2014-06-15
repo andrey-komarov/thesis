@@ -27,6 +27,15 @@
 \usepackage{epigraph}
 \usepackage{agda}
 
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
 \usepackage[toc,page]{appendix}
 \renewcommand{\appendixtocname}{Приложения}
 \renewcommand{\appendixpagename}{Приложения}
@@ -156,6 +165,9 @@
 \input{chapters/outro.tex}
 
 \printbibliography
+
+%%\startappendices
+%%\input{chapters/0A-source.tex}
 
 \begin{appendices}
   \renewcommand{\thechapter}{\arabic{chapter}}
