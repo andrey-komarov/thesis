@@ -66,7 +66,7 @@
 \>[4]\AgdaInductiveConstructor{⊥∥⊤} \AgdaSymbol{:} \AgdaSymbol{∀} \AgdaSymbol{\{}\AgdaBound{n}\AgdaSymbol{\}\{}\AgdaBound{f₁} \AgdaBound{f₂} \AgdaSymbol{:} \AgdaFunction{Form} \AgdaBound{n}\AgdaSymbol{\}} \AgdaSymbol{→} \AgdaBound{f₁} \AgdaDatatype{∥} \AgdaBound{f₂} \AgdaSymbol{→} \AgdaSymbol{(}\AgdaInductiveConstructor{false} \AgdaInductiveConstructor{∷} \AgdaBound{f₁}\AgdaSymbol{)} \AgdaDatatype{∥} \AgdaSymbol{(}\AgdaInductiveConstructor{true} \AgdaInductiveConstructor{∷} \AgdaBound{f₂}\AgdaSymbol{)}\<%
 \end{code}
 
-Здесь дано индуктивное опеределение совместности форм, которое гласит,
+Здесь дано индуктивное определение совместности форм, которое гласит,
 что пустые формы совместны, а непустые совместны, если первыми
 элементами в них идут не два \AgdaInductiveConstructor{true}.
 
@@ -385,7 +385,7 @@
 
 \subsection{Объединение неконфликтующих патчей}
 
-Введём функцию, строяющую по двум совместным формам их объединение.
+Введём функцию, строящую по двум совместным формам их объединение.
 Эта функция просто будет считать поэлементное <<или>> двух форм.
 Например, 
 \begin{tikzpicture}\matrix 

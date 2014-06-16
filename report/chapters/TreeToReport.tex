@@ -56,7 +56,7 @@
 \>[2]\AgdaInductiveConstructor{Branch} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{left} \AgdaBound{right} \AgdaSymbol{:} \AgdaDatatype{Form}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Form}\<%
 \end{code}
 
-Естесственным образом вводится опеределение совместности таких форм.
+Естественным образом вводится опеределение совместности таких форм.
 Формы совместны, если:
 
 \begin{code}%
@@ -98,21 +98,23 @@
 \>\AgdaKeyword{data} \AgdaDatatype{Patch} \AgdaSymbol{:} \AgdaDatatype{Form} \AgdaSymbol{→} \AgdaPrimitiveType{Set} \AgdaKeyword{where}\<%
 \end{code}
 
-Ничего не менять
+\begin{itemize}
+
+\item ничего не менять;
 
 \begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaInductiveConstructor{I} \AgdaSymbol{:} \AgdaDatatype{Patch} \AgdaInductiveConstructor{Skip}\<%
 \end{code}
 
-Либо, заменить какое-то поддерево на другое поддерево
+\item либо, заменить какое-то поддерево на другое поддерево;
 
 \begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
 \>[2]\AgdaInductiveConstructor{⟨\_⇒\_⟩} \AgdaSymbol{:} \AgdaSymbol{(}\AgdaBound{from} \AgdaBound{to} \AgdaSymbol{:} \AgdaDatatype{Tree}\AgdaSymbol{)} \AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaInductiveConstructor{Take}\<%
 \end{code}
 
-Либо, что-то сделать в поддеревьях
+\item либо, что-то сделать в поддеревьях;
 
 \begin{code}%
 \>[0]\AgdaIndent{2}{}\<[2]%
@@ -121,6 +123,8 @@
 \>[2]\AgdaIndent{4}{}\<[4]%
 \>[4]\AgdaSymbol{→} \AgdaDatatype{Patch} \AgdaSymbol{(}\AgdaInductiveConstructor{Branch} \AgdaBound{sl} \AgdaBound{sr}\AgdaSymbol{)}\<%
 \end{code}
+
+\end{itemize}
 
 \begin{figure}
   \centering
@@ -263,7 +267,7 @@
 Будем называть два патча эквивалентными, если из того, что один из
 патчей можно применить к данной ревизии следует, что можно применить и
 второй, и результаты после применения совпадут. Прежде чем вводить,
-Непосредственно, Эквивалентность, введём отношение, которое можно
+непосредственно, эквивалентность, введём отношение, которое можно
 назвать \emph{не хуже, чем}:
 
 \begin{code}%
